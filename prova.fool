@@ -1,0 +1,32 @@
+/*let 
+  var x:int = 1;
+  var b:bool = true;
+in
+  print (if (x == b) then { x+1 } else { x+2 });
+let 
+  var x:int = 1;
+  var b:bool = true;
+in
+  print (if (b) then { x+1 } else { x+2 });
+
+---------------
+
+let 
+  fun f:int (i:int, j:int) i+j;
+in
+  print (f(3,5));
+
+----------------
+*/
+let
+  var y:int = 5+2;
+  fun veryFunctionPedrolix:bool (n:int, m:int)
+    let 
+      var x:int = m;
+  in x==y;   
+in  
+  print ( 
+    if veryFunctionPedrolix(y,8) 
+      then { false }
+      else { 10 }
+  ); 
