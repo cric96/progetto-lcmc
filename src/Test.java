@@ -9,7 +9,7 @@ import ast.core.Type;
 public class Test {
     public static void main(String[] args) throws Exception {
       
-        String fileName = "prova.fool";
+        String fileName = "prova-old.fool";
       
         CharStream chars = CharStreams.fromFileName(fileName);
         FOOLLexer lexer = new FOOLLexer(chars);

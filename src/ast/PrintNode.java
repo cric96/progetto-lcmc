@@ -6,23 +6,22 @@ import ast.exception.WrongTypeException;
 
 public class PrintNode implements Node {
 
-  private Node exp;
-  
-  public PrintNode (Node e) {
-   exp=e;
-  }
-  
-  public String toPrint(String s) {
-   return s+"Print\n" + exp.toPrint(s+"  ") ;
-  }
+	private final Node exp;
 
-  public Type typeCheck() throws WrongTypeException {
-	    return exp.typeCheck();
-  }
-      
-  public String codeGeneration() {
-	  return exp.codeGeneration()+
-			 "print\n";
-  }
+	public PrintNode(final Node exp) {
+		this.exp = exp;
+	}
 
-}  
+	public String toPrint(String s) {
+		return s + "Print\n" + exp.toPrint(s + "  ");
+	}
+
+	public Type typeCheck() throws WrongTypeException {
+		return exp.typeCheck();
+	}
+
+	public String codeGeneration() {
+		return exp.codeGeneration() + "print\n";
+	}
+
+}

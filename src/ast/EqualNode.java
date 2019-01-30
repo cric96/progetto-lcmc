@@ -4,16 +4,18 @@ import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
 import ast.type.BoolType;
+import ast.util.LabelGenerator;
+import ast.util.LabelGenerator.GenerationSeed;
 import lib.FOOLlib;
 
 public class EqualNode implements Node {
 
-	private Node left;
-	private Node right;
+	private final Node left;
+	private final Node right;
 
-	public EqualNode(Node l, Node r) {
-		left = l;
-		right = r;
+	public EqualNode(final Node left, final Node right) {
+		this.left = left;
+		this.right = right;
 	}
 
 	public String toPrint(String s) {
@@ -30,8 +32,8 @@ public class EqualNode implements Node {
 	}
 
 	public String codeGeneration() {
-		String l1 = FOOLlib.freshLabel();
-		String l2 = FOOLlib.freshLabel();
+		String l1 = LabelGenerator.generate(GenerationSeed.Standard.True);
+		String l2 = LabelGenerator.generate(GenerationSeed.Standard.False);
 		return left.codeGeneration() + right.codeGeneration() + "beq " + l1 + "\n" + "push 0\n" + "b " + l2 + "\n" + l1
 				+ ": \n" + "push 1\n" + l2 + ": \n";
 	}

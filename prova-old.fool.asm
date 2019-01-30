@@ -1,10 +1,10 @@
 push 0
 push 5
-push 2
+push 3
 add
-push veryFunctionPedrolix0
+push f0
 lfp
-push 8
+push 7
 push -2
 lfp
 add
@@ -25,22 +25,28 @@ ifFalse0:
 print
 halt
 
-veryFunctionPedrolix0:
+f0:
 cfp
 lra
+push 1
+push -2
+lfp
+add
+lw
+push 1
+lfp
+add
+lw
 push 2
 lfp
 add
 lw
-push -2
-lfp
-add
-lw
-push -2
-lfp
-lw
-add
-lw
+beq true1
+push 0
+b false1
+true1: 
+push 1
+false1: 
 beq true0
 push 0
 b false0

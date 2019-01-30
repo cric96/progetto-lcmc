@@ -5,6 +5,10 @@ import java.util.Objects;
 import ast.core.Type;
 
 public class WrongTypeException extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6539993742283487775L;
 	private final Type expectedType;
 	private final Type receivedType;
 	private String prefix;
@@ -31,7 +35,7 @@ public class WrongTypeException extends Exception {
 	}
 	
 	public String toString() {
-		return "Wrong type Exception: " + prefix + expectedType != null ? ": type" + receivedType + " doesn't match with " + expectedType : ""; 
+		return "Wrong type Exception: " + prefix + (expectedType != null ? ": type " + receivedType + " doesn't match with " + expectedType : ""); 
 	}
 	
 }

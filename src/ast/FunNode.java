@@ -1,18 +1,22 @@
 package ast;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
+import ast.util.LabelGenerator;
+import ast.util.LabelGenerator.GenerationSeed;
 import lib.FOOLlib;
 
 public class FunNode implements Node {
 	//TODO GUARDA PAR LIST E DECLARATION LIST, SONO TIPO??
-	private String id;
-	private Type type;
-	private ArrayList<Node> parlist = new ArrayList<Node>(); // campo "parlist" che è lista di Node
-	private ArrayList<Node> declist = new ArrayList<Node>();
+	private final String id;
+	private final Type type;
+	private List<Node> parlist = new ArrayList<Node>(); // campo "parlist" che è lista di Node
+	private List<Node> declist = new ArrayList<Node>();
 	private Node exp;
 
 	public FunNode(final String i, final Type  t) {
@@ -20,7 +24,7 @@ public class FunNode implements Node {
 		type = t;
 	}
 
-	public void addDec(ArrayList<Node> d) {
+	public void addDec(List<Node> d) {
 		declist = d;
 	}
 
@@ -33,14 +37,8 @@ public class FunNode implements Node {
 	}
 
 	public String toPrint(String s) {
-		String parlstr = "";
-		for (Node par : parlist) {
-			parlstr += par.toPrint(s + "  ");
-		}
-		String declstr = "";
-		for (Node dec : declist) {
-			declstr += dec.toPrint(s + "  ");
-		}
+		final String parlstr = parlist.stream().map(x -> x.toPrint(s + " ")).collect(Collectors.joining());
+		final String declstr = declist.stream().map(x -> x.toPrint(s + " ")).collect(Collectors.joining());
 		return s + "Fun:" + id + "\n" + type.toPrint(s + "  ") + parlstr + declstr + exp.toPrint(s + "  ");
 	}
 
@@ -55,19 +53,12 @@ public class FunNode implements Node {
 	}
 
 	public String codeGeneration() {
-		String declCode = "";
-		for (Node dec : declist)
-			declCode += dec.codeGeneration();
 
-		String popDecl = "";
-		for (Node dec : declist)
-			popDecl += "pop\n";
-
-		String popParl = "";
-		for (Node par : parlist)
-			popParl += "pop\n";
-
-		String funl = FOOLlib.freshFunLabel();
+		final String popDecl = declist.stream().map(x -> "pop\n").collect(Collectors.joining());
+		final String popParl = parlist.stream().map(x -> "pop\n").collect(Collectors.joining());
+		final String declCode = declist.stream().map(Node::codeGeneration).collect(Collectors.joining());
+		
+		String funl = LabelGenerator.generate(GenerationSeed.Function(id));
 
 		FOOLlib.putCode(funl + ":\n" + "cfp\n" + // setta $fp a $sp
 				"lra\n" + // inserisce return address

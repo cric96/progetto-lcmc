@@ -1,10 +1,6 @@
 package ast.util;
 
-import ast.util.LabelGenerator.GenerationSeed;
-
 public class LabelGenerator {
-	private static final String init ="label";
-	private static int number = 0;
 	public static String generate() {
 		return generate(GenerationSeed.Standard.Generic);
 	}

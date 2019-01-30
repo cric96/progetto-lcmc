@@ -11,9 +11,9 @@ public class MultNode implements Node {
 	private final Node left;
 	private final Node right;
 
-	public MultNode(final Node l, final Node r) {
-		left = l;
-		right = r;
+	public MultNode(final Node left, final Node right) {
+		this.left = left;
+		this.right = right;
 	}
 
 	public String toPrint(String s) {

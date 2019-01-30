@@ -8,13 +8,13 @@ import ast.type.ArrowType;
 
 public class IdNode implements Node {
 
-	private String id;
-	private int nestingLevel;
-	private STentry entry;
+	private final String id;
+	private final int nestingLevel;
+	private final STentry entry;
 
-	public IdNode(String i, STentry st, int nl) {
-		id = i;
-		nestingLevel = nl;
+	public IdNode(final String id, final STentry st, final int nestringLevel) {
+		this.id = id;
+		nestingLevel = nestringLevel;
 		entry = st;
 	}
 
