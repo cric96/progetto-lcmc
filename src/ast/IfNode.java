@@ -1,6 +1,9 @@
 package ast;
 
 import ast.core.Node;
+import ast.core.Type;
+import ast.exception.WrongTypeException;
+import ast.type.BoolType;
 import lib.FOOLlib;
 
 public class IfNode implements Node {
@@ -21,20 +24,17 @@ public class IfNode implements Node {
                  + el.toPrint(s+"  ") ; 
   }
 
-  public Node typeCheck() {
-	if ( !(FOOLlib.isSubtype(cond.typeCheck(), new BoolTypeNode())) ) {
-	  System.out.println("non boolean condition in if");
-      System.exit(0);		
+  public Type typeCheck() throws WrongTypeException {
+	if (!(FOOLlib.isSubtype(cond.typeCheck(), BoolType.instance())) ) {
+		throw new WrongTypeException("non boolean condition in if");
 	}
-	Node t= th.typeCheck();  
-	Node e= el.typeCheck();  
-	if (FOOLlib.isSubtype(t, e))
+	final Type then= th.typeCheck();  
+	final Type e=  el.typeCheck();  
+	if (FOOLlib.isSubtype(then, e))
       return e;
-	if (FOOLlib.isSubtype(e, t))
-	  return t;
-	System.out.println("Incompatible types in then-else branches");
-    System.exit(0);
-    return null;
+	if (FOOLlib.isSubtype(e, then))
+	  return then;
+	throw new WrongTypeException("Incompatible types in then-else branches");
   }
   
   public String codeGeneration() {

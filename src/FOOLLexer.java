@@ -3,6 +3,8 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import ast.*;
+import ast.core.*;
+import ast.type.*;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;

@@ -1,13 +1,14 @@
 package ast;
 
 import ast.core.Node;
+import ast.core.Type;
 
 public class ParNode implements Node {
 
-  private String id;
-  private Node type;
+  private final String id;
+  private final Type type;
   
-  public ParNode (String i, Node t) {
+  public ParNode (final String i, final Type t) {
    id=i;
    type=t;
   }
@@ -18,7 +19,7 @@ public class ParNode implements Node {
   }
 
   //non utilizzato
-  public Node typeCheck() {return null;}
+  public Type typeCheck() {return null;}
    
   public String codeGeneration() {return "";}
 

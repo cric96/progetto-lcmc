@@ -1,34 +1,39 @@
 package ast;
 
 import ast.core.Node;
+import ast.core.Type;
+import ast.exception.WrongTypeException;
+import ast.type.IntType;
 import lib.*;
 
 public class MultNode implements Node {
 
-  private Node left;
-  private Node right;
-  
-  public MultNode (Node l, Node r) {
-   left=l;
-   right=r;
-  }
-  
-  public String toPrint(String s) {
-   return s+"Mult\n" + left.toPrint(s+"  ")  
-                     + right.toPrint(s+"  ") ; 
-  }
+	private final Node left;
+	private final Node right;
 
-  public Node typeCheck() {
-   if ( ! ( FOOLlib.isSubtype(left.typeCheck(), new IntTypeNode()) &&
-		    FOOLlib.isSubtype(right.typeCheck(), new IntTypeNode()) ) ) {
-			  System.out.println("Non integers in multiplication");
-			  System.exit(0);	
-   }
-   return new IntTypeNode();
-  }
-  
-  public String codeGeneration() {
-	  return left.codeGeneration()+right.codeGeneration()+"mult\n";
-  }
+	public MultNode(final Node l, final Node r) {
+		left = l;
+		right = r;
+	}
 
-}  
+	public String toPrint(String s) {
+		return s + "Mult\n" + left.toPrint(s + "  ") + right.toPrint(s + "  ");
+	}
+
+	public Type typeCheck() throws WrongTypeException {
+		checkCorrectness(left);
+		checkCorrectness(right);
+		return IntType.instance();
+	}
+
+	private void checkCorrectness(final Node node) throws WrongTypeException {
+		if (!(FOOLlib.isSubtype(node.typeCheck(), IntType.instance()))) {
+			throw new WrongTypeException("Non integers in multiplication", IntType.instance(), node.typeCheck());
+		}
+	}
+
+	public String codeGeneration() {
+		return left.codeGeneration() + right.codeGeneration() + "mult\n";
+	}
+
+}

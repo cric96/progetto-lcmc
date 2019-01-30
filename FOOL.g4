@@ -1,11 +1,15 @@
 grammar FOOL;
 
+//header: serve per importare i package nel SVM parser (definisco quali package il parser avrà bisogno di usare)
 @header{
 import java.util.ArrayList;
 import java.util.HashMap;
 import ast.*;
+import ast.core.*;
+import ast.type.*;
 }
 
+//attributi della classe parser, verranno usati durante il parsing
 @parser::members{
 private int nestingLevel = 0;
 private ArrayList<HashMap<String,STentry>> symTable = new ArrayList<HashMap<String,STentry>>();
@@ -60,7 +64,7 @@ declist	returns [ArrayList<Node> astlist]
                 HashMap<String,STentry> hmn = new HashMap<String,STentry> ();
                 symTable.add(hmn);
                 }
-              LPAR {ArrayList<Node> parTypes = new ArrayList<Node>();
+              LPAR {ArrayList<Type> parTypes = new ArrayList<Type>();
               	int parOffset = 1;
               }
                 //DA QUI ESERCITAZIONE
@@ -85,7 +89,7 @@ declist	returns [ArrayList<Node> astlist]
                   )*
                 )? 
                 //FINO A QUI ESERCITAZIONE
-              RPAR {entry.addType(new ArrowTypeNode(parTypes,$t.ast));}
+              RPAR {entry.addType(new ArrowType(parTypes,$t.ast));}
               (LET d=declist IN {f.addDec($d.astlist);})? e=exp
               {f.addBody($e.ast);
                //rimuovere la hashmap corrente poiché esco dallo scope               
@@ -95,9 +99,9 @@ declist	returns [ArrayList<Node> astlist]
     )+          
 	;
 	
-type	returns [Node ast]
-  : INT  {$ast=new IntTypeNode();}
-  | BOOL {$ast=new BoolTypeNode();} 
+type	returns [Type ast]
+  : INT  {$ast = IntType.instance();}
+  | BOOL {$ast = BoolType.instance();} 
 	;	
 
 //FINO A QUI

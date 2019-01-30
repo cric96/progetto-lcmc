@@ -3,6 +3,8 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import ast.*;
+import ast.core.*;
+import ast.type.*;
 
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -318,7 +320,7 @@ public class FOOLParser extends Parser {
 					                
 					setState(43);
 					match(LPAR);
-					ArrayList<Node> parTypes = new ArrayList<Node>();
+					ArrayList<Type> parTypes = new ArrayList<Type>();
 					              	int parOffset = 1;
 					              
 					setState(60);
@@ -373,7 +375,7 @@ public class FOOLParser extends Parser {
 
 					setState(62);
 					match(RPAR);
-					entry.addType(new ArrowTypeNode(parTypes,((DeclistContext)_localctx).t.ast));
+					entry.addType(new ArrowType(parTypes,((DeclistContext)_localctx).t.ast));
 					setState(69);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
@@ -422,7 +424,7 @@ public class FOOLParser extends Parser {
 	}
 
 	public static class TypeContext extends ParserRuleContext {
-		public Node ast;
+		public Type ast;
 		public TerminalNode INT() { return getToken(FOOLParser.INT, 0); }
 		public TerminalNode BOOL() { return getToken(FOOLParser.BOOL, 0); }
 		public TypeContext(ParserRuleContext parent, int invokingState) {
@@ -443,7 +445,7 @@ public class FOOLParser extends Parser {
 				{
 				setState(82);
 				match(INT);
-				((TypeContext)_localctx).ast = new IntTypeNode();
+				((TypeContext)_localctx).ast =  IntType.instance();
 				}
 				break;
 			case BOOL:
@@ -451,7 +453,7 @@ public class FOOLParser extends Parser {
 				{
 				setState(84);
 				match(BOOL);
-				((TypeContext)_localctx).ast = new BoolTypeNode();
+				((TypeContext)_localctx).ast =  BoolType.instance();
 				}
 				break;
 			default:

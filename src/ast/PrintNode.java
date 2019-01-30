@@ -1,6 +1,8 @@
 package ast;
 
 import ast.core.Node;
+import ast.core.Type;
+import ast.exception.WrongTypeException;
 
 public class PrintNode implements Node {
 
@@ -14,7 +16,7 @@ public class PrintNode implements Node {
    return s+"Print\n" + exp.toPrint(s+"  ") ;
   }
 
-  public Node typeCheck() {
+  public Type typeCheck() throws WrongTypeException {
 	    return exp.typeCheck();
   }
       

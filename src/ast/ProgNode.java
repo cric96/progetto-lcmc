@@ -2,6 +2,8 @@ package ast;
 import java.util.ArrayList;
 
 import ast.core.Node;
+import ast.core.Type;
+import ast.exception.WrongTypeException;
 
 public class ProgNode implements Node {
 
@@ -16,7 +18,7 @@ public class ProgNode implements Node {
    return s+"Prog\n" + exp.toPrint(s+"  ") ;
   }
   
-  public Node typeCheck() {
+  public Type typeCheck() throws WrongTypeException {
 	    return exp.typeCheck();
   }
     

@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import org.antlr.v4.runtime.*;
 
 import ast.core.Node;
+import ast.core.Type;
 
 public class Test {
     public static void main(String[] args) throws Exception {
@@ -22,7 +23,7 @@ public class Test {
         System.out.println("Visualizing AST...");
         System.out.print(ast.toPrint(""));
         
-        Node type= ast.typeCheck(); //type-checking bottom-up
+        final Type type= ast.typeCheck(); //type-checking bottom-up
         System.out.println(type.toPrint("Type checking ok! Type of the program is: "));  
      
         String code=ast.codeGeneration(); 

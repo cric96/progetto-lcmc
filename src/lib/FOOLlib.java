@@ -1,13 +1,15 @@
 package lib;
 
-import ast.*;
-import ast.core.Node;
+import ast.core.Type;
+import ast.type.BoolType;
+import ast.type.IntType;
 
 public class FOOLlib {
+	
   //valuta se il tipo "a" è <= al tipo "b", dove "a" e "b" sono tipi di base: int o bool
-  public static boolean isSubtype (Node a, Node b) {
+  public static boolean isSubtype (final Type a, final Type b) {
 	return a.getClass().equals(b.getClass()) ||
-	    	   ( (a instanceof BoolTypeNode) && (b instanceof IntTypeNode) );  
+	    	   ( (a == BoolType.instance()) && (b == IntType.instance()));  
   }
   
   private static int labCount=0; 

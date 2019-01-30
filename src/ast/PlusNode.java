@@ -1,14 +1,17 @@
 package ast;
 
 import ast.core.Node;
+import ast.core.Type;
+import ast.exception.WrongTypeException;
+import ast.type.IntType;
 import lib.*;
 
 public class PlusNode implements Node {
 
-  private Node left;
-  private Node right;
+  private final Node left;
+  private final Node right;
   
-  public PlusNode (Node l, Node r) {
+  public PlusNode (final Node l, final Node r) {
    left=l;
    right=r;
   }
@@ -18,13 +21,15 @@ public class PlusNode implements Node {
                      + right.toPrint(s+"  ") ; 
   }
 
-  public Node typeCheck() {
-	if ( ! ( FOOLlib.isSubtype(left.typeCheck(), new IntTypeNode()) &&
-	         FOOLlib.isSubtype(right.typeCheck(), new IntTypeNode()) ) ) {
-		System.out.println("Non integers in sum");
-		System.exit(0);	
-	}
-	return new IntTypeNode();
+  public Type typeCheck() throws WrongTypeException {
+	checkCorrectness(left);
+	checkCorrectness(right);
+	return IntType.instance();
+  }
+  private void checkCorrectness(final Node node) throws WrongTypeException {
+	  if(!( FOOLlib.isSubtype(node.typeCheck(), IntType.instance()))) {
+		  throw new WrongTypeException("Non integers in sum",IntType.instance(), node.typeCheck());
+	  }
   }
   
   public String codeGeneration() {

@@ -2,54 +2,58 @@ push 0
 push 5
 push 2
 add
-push veryFunctionPedrolix0
+push function0
 lfp
 push 8
 push -2
 lfp
-add 
-lw 
+add
+lw
 lfp
 push -3
 lfp
-add 
-lw 
-js 
+add
+lw
+js
 push 1
-beq ifTrue0
+beq label2
 push 10
-b ifFalse0
-ifTrue0: push 0
-ifFalse0: print
+b label3
+label2: 
+push 0
+label3: 
+print
 halt
 
-veryFunctionPedrolix0: 
-cfp 
-lra 
+function0:
+cfp
+lra
 push 2
 lfp
-add 
-lw 
+add
+lw
 push -2
 lfp
-add 
-lw 
+add
+lw
 push -2
 lfp
 lw
-add 
-lw 
-beq true0
+add
+lw
+beq label0
 push 0
-b false0
-true0: push 1
-false0: srv 
+b label1
+label0: 
+push 1
+label1: 
+srv
 pop
-sra 
-pop 
+sra
 pop
 pop
-sfp 
-lrv 
-lra 
-js 
+pop
+sfp
+lrv
+lra
+js

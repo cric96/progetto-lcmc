@@ -1,12 +1,14 @@
 package ast;
 
 import ast.core.Node;
+import ast.core.Type;
+import ast.type.IntType;
 
 public class IntNode implements Node {
 
-  private Integer val;
+  private final Integer val;
   
-  public IntNode (Integer n) {
+  public IntNode (final Integer n) {
    val=n;
   }
   
@@ -14,8 +16,8 @@ public class IntNode implements Node {
    return s+"Int:" + Integer.toString(val) +"\n";  
   }
 
-  public Node typeCheck() {
-	return new IntTypeNode(); 
+  public Type typeCheck() {
+	return IntType.instance(); 
   }
   
   public String codeGeneration() {
