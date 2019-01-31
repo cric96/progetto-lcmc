@@ -943,8 +943,8 @@ public class FOOLParser extends Parser {
 					setState(197);
 					match(AND);
 					setState(198);
-					factor();
-					((TermContext)_localctx).ast =  null;
+					((TermContext)_localctx).other = factor();
+					((TermContext)_localctx).ast =  new AndNode(_localctx.ast, ((TermContext)_localctx).other.ast);
 					}
 					break;
 				default:
@@ -1031,7 +1031,7 @@ public class FOOLParser extends Parser {
 					match(GE);
 					setState(213);
 					((FactorContext)_localctx).other = value();
-					 ((FactorContext)_localctx).ast =  null;
+					 ((FactorContext)_localctx).ast =  new GreaterEqualNode(_localctx.ast,((FactorContext)_localctx).other.ast);
 					}
 					break;
 				case LE:
@@ -1040,7 +1040,7 @@ public class FOOLParser extends Parser {
 					match(LE);
 					setState(217);
 					((FactorContext)_localctx).other = value();
-					 ((FactorContext)_localctx).ast =  null;
+					 ((FactorContext)_localctx).ast =  new LessEqualNode(_localctx.ast,((FactorContext)_localctx).other.ast);
 					}
 					break;
 				default:

@@ -183,7 +183,7 @@ term returns [Node ast]
     }
         ( TIMES other=factor { $ast = new MultNode ($ast, $other.ast); }
   	             | DIV  factor {$ast = null;}
-  	             | AND  factor {$ast = null;}
+  	             | AND  other=factor {$ast = new AndNode($ast, $other.ast);}
   	             )*
   	    ;
   	
@@ -192,8 +192,8 @@ factor returns [Node ast]
         $ast = $first.ast;
     }
         ( EQ other=value { $ast = new EqualNode ($ast,$other.ast);}
-	            | GE other=value { $ast = null;}
-	            | LE other=value { $ast = null;}
+	            | GE other=value { $ast = new GreaterEqualNode($ast,$other.ast);}
+	            | LE other=value { $ast = new LessEqualNode($ast,$other.ast);}
 	            )*
 	    ;    	
   	
