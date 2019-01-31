@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
-import lib.FOOLlib;
+import ast.util.FunctionDeclarations;
 
 public class ProgLetInNode implements Node {
 
@@ -35,7 +35,7 @@ public class ProgLetInNode implements Node {
 
 	public String codeGeneration() {
 		String declCode = declarationList.stream().map(Node::codeGeneration).collect(Collectors.joining());
-		return "push 0\n" + declCode + exp.codeGeneration() + "halt\n" + FOOLlib.getFunctionCode();
+		return "push 0\n" + declCode + exp.codeGeneration() + "halt\n" + FunctionDeclarations.getCode();
 	}
 
 }

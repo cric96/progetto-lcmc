@@ -1,4 +1,4 @@
-package ast;
+package ast.operator;
 
 import ast.core.Node;
 import ast.core.Type;
@@ -31,8 +31,8 @@ public class EqualNode implements Node {
 	}
 
 	public String codeGeneration() {
-		String l1 = LabelGenerator.generate(GenerationSeed.Standard.True);
-		String l2 = LabelGenerator.generate(GenerationSeed.Standard.False);
+		String l1 = LabelGenerator.generate(GenerationSeed.Standard.Equal);
+		String l2 = LabelGenerator.generate(GenerationSeed.Standard.Equal);
 		return left.codeGeneration() + right.codeGeneration() + "beq " + l1 + "\n" + "push 0\n" + "b " + l2 + "\n" + l1
 				+ ": \n" + "push 1\n" + l2 + ": \n";
 	}

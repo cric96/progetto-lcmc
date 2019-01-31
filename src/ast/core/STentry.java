@@ -6,9 +6,9 @@ package ast.core;
  */
 public class STentry {
 
-	private int nl;
+	private final int nl;
 	private Type type;
-	private int offset; //TODO DA RIVEDERE
+	private final int offset; //TODO DA RIVEDERE
 
 	public STentry(int n, int os) {
 		nl = n;

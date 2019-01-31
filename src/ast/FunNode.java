@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
+import ast.util.FunctionDeclarations;
 import ast.util.LabelGenerator;
 import ast.util.LabelGenerator.GenerationSeed;
-import lib.FOOLlib;
 
 public class FunNode implements Node {
 	//TODO GUARDA PAR LIST E DECLARATION LIST, SONO TIPO??
@@ -60,7 +60,7 @@ public class FunNode implements Node {
 		
 		String funl = LabelGenerator.generate(GenerationSeed.createFunctionSeed(id));
 
-		FOOLlib.putFunctionCode(funl + ":\n" + "cfp\n" + // setta $fp a $sp
+		FunctionDeclarations.putCode(funl + ":\n" + "cfp\n" + // setta $fp a $sp
 				"lra\n" + // inserisce return address
 				declCode + // inresisce dichiarazioni locali
 				exp.codeGeneration() + "srv\n" + // pop del return value

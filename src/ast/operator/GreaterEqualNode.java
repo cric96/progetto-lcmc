@@ -1,41 +1,21 @@
-package ast;
+package ast.operator;
 
 import ast.core.Node;
-import ast.core.Type;
-import ast.exception.WrongTypeException;
 import ast.type.BoolType;
 import ast.type.IntType;
 import ast.util.LabelGenerator;
+import ast.util.LabelGenerator.GenerationSeed;
 
-public class GreaterEqualNode implements Node {
-	private final Node left;
-	private final Node right;
+public class GreaterEqualNode extends BiOperatorNode {
 
 	public GreaterEqualNode(final Node left, final Node right) {
-		this.left = left;
-		this.right = right;
-	}
-
-	public String toPrint(String s) {
-		return s + "LessEqual\n" + left.toPrint(s + "  ") + right.toPrint(s + "  ");
-	}
-
-	public Type typeCheck() throws WrongTypeException {
-		checkCorrectness(left);
-		checkCorrectness(right);
-		return BoolType.instance();
-	}
-
-	private void checkCorrectness(final Node node) throws WrongTypeException {
-		if (!(node.typeCheck().isSubtype(IntType.instance()))) {
-			throw new WrongTypeException("Non integers in less equal", IntType.instance(), node.typeCheck());
-		}
+		super(left, right, "GreaterEqual", BoolType.instance(), IntType.instance());
 	}
 
 	@Override
 	public String codeGeneration() {
-		final String l1 = LabelGenerator.generate();
-		final String l2 = LabelGenerator.generate();
+		final String l1 = LabelGenerator.generate(GenerationSeed.Standard.GreaterEqual);
+		final String l2 = LabelGenerator.generate(GenerationSeed.Standard.GreaterEqual);
 		/*
 		 * idea: per fare in modo di simulare il >= sottraggo i due numeri, se il
 		 * risultato è negativo (<= -1) allora vuol dire che left <= right altrimento

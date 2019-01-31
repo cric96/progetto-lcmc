@@ -1,10 +1,11 @@
-package ast;
+package ast.operator;
 
 import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
 import ast.type.BoolType;
 import ast.util.LabelGenerator;
+import ast.util.LabelGenerator.GenerationSeed;
 
 public class NotNode implements Node {
 
@@ -29,16 +30,16 @@ public class NotNode implements Node {
 
 	@Override
 	public String codeGeneration() {
-		final String l1 = LabelGenerator.generate();
-		final String l2 = LabelGenerator.generate();
-		return exp.codeGeneration()
-				+ "push 0\n"
-				+ "beq " + l1 + "\n"
-				+ "push 0\n"
-				+ "b " + l2 + "\n"
-				+ l1 + ": \n" 
-				+ "push 1\n"
-				+ l2 + ": \n";
+	final String l1 = LabelGenerator.generate(GenerationSeed.Standard.Not);
+	final String l2 = LabelGenerator.generate(GenerationSeed.Standard.Not);
+	return exp.codeGeneration()
+			+ "push 0\n"
+			+ "beq " + l1 + "\n"
+			+ "push 0\n"
+			+ "b " + l2 + "\n"
+			+ l1 + ": \n" 
+			+ "push 1\n"
+			+ l2 + ": \n";
 	}
 
 }

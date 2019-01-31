@@ -7,6 +7,8 @@ import java.util.List;
 import ast.*;
 import ast.core.*;
 import ast.type.*;
+import ast.exception.*;
+import ast.operator.*;
 
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -630,9 +632,7 @@ public class FOOLParser extends Parser {
 					                final Map<String,STentry> hm = symTable.get(nestingLevel);
 					                if (hm.put((((DeclistContext)_localctx).id!=null?((DeclistContext)_localctx).id.getText():null),new STentry(nestingLevel,((DeclistContext)_localctx).t.nodeType, --offset)) != null )
 					                {
-					                    //TODO METTI ECCEZIONI 
-					                    System.out.println("Var id "+(((DeclistContext)_localctx).id!=null?((DeclistContext)_localctx).id.getText():null)+" at line "+(((DeclistContext)_localctx).id!=null?((DeclistContext)_localctx).id.getLine():0)+" already declared");
-					                    System.exit(0);
+					                	throw new AlreadyDeclaredException(Declaration.Var,(((DeclistContext)_localctx).id!=null?((DeclistContext)_localctx).id.getText():null),(((DeclistContext)_localctx).id!=null?((DeclistContext)_localctx).id.getLine():0));
 					                }
 					            
 					}
@@ -652,12 +652,7 @@ public class FOOLParser extends Parser {
 					                _localctx.astlist.add(function);                              
 					                Map<String,STentry> hm = symTable.get(nestingLevel);
 					                final STentry entry = new STentry(nestingLevel,null,--offset);
-					                if (hm.put((((DeclistContext)_localctx).funId!=null?((DeclistContext)_localctx).funId.getText():null),entry) != null  )
-					                {
-					                    //TODO METTI ECCEZIONI 
-					                    System.out.println("Fun id "+(((DeclistContext)_localctx).funId!=null?((DeclistContext)_localctx).funId.getText():null)+" at line "+(((DeclistContext)_localctx).funId!=null?((DeclistContext)_localctx).funId.getLine():0)+" already declared");
-					                    System.exit(0);
-					                }
+					                
 					                //creare una nuova hashmap per la symTable
 					                //RICORDA DI AGGIUNGERE IL NESTING LEVEL
 					                nestingLevel++;
@@ -686,9 +681,7 @@ public class FOOLParser extends Parser {
 						                    ParNode fpar = new ParNode((((DeclistContext)_localctx).firstId!=null?((DeclistContext)_localctx).firstId.getText():null),((DeclistContext)_localctx).firstType.nodeType); //creo nodo ParNode
 						                    function.addPar(fpar);                                 //lo attacco al FunNode con addPar
 						                    if ( hmn.put((((DeclistContext)_localctx).firstId!=null?((DeclistContext)_localctx).firstId.getText():null),new STentry(nestingLevel,((DeclistContext)_localctx).firstType.nodeType, parOffset ++)) != null  ){
-						                        //TODO lancia eccezioni
-						                        System.out.println("Parameter id "+(((DeclistContext)_localctx).firstId!=null?((DeclistContext)_localctx).firstId.getText():null)+" at line "+(((DeclistContext)_localctx).firstId!=null?((DeclistContext)_localctx).firstId.getLine():0)+" already declared");
-						                        System.exit(0);
+						                        throw new AlreadyDeclaredException(Declaration.Parameter,(((DeclistContext)_localctx).firstId!=null?((DeclistContext)_localctx).firstId.getText():null),(((DeclistContext)_localctx).firstId!=null?((DeclistContext)_localctx).firstId.getLine():0));
 						                    }
 						                  
 						setState(143);
@@ -710,9 +703,7 @@ public class FOOLParser extends Parser {
 								                   ParNode par = new ParNode((((DeclistContext)_localctx).otherId!=null?((DeclistContext)_localctx).otherId.getText():null),((DeclistContext)_localctx).otherType.nodeType); 
 								                   function.addPar(par);
 								                    if ( hmn.put((((DeclistContext)_localctx).otherId!=null?((DeclistContext)_localctx).otherId.getText():null),new STentry(nestingLevel,((DeclistContext)_localctx).otherType.nodeType, parOffset ++)) != null  ){
-								                        //TODO lancia eccezioni
-								                        System.out.println("Parameter id "+(((DeclistContext)_localctx).id!=null?((DeclistContext)_localctx).id.getText():null)+" at line "+(((DeclistContext)_localctx).id!=null?((DeclistContext)_localctx).id.getLine():0)+" already declared");
-								                        System.exit(0);
+								                        throw new AlreadyDeclaredException(Declaration.Parameter,(((DeclistContext)_localctx).otherId!=null?((DeclistContext)_localctx).otherId.getText():null),(((DeclistContext)_localctx).otherId!=null?((DeclistContext)_localctx).otherId.getLine():0));
 								                    }
 								                
 							}
@@ -728,6 +719,10 @@ public class FOOLParser extends Parser {
 					match(RPAR);
 
 						                    entry.addType(new ArrowType(parTypes,((DeclistContext)_localctx).retType.nodeType));
+						                    if (hm.put((((DeclistContext)_localctx).funId!=null?((DeclistContext)_localctx).funId.getText():null),entry) != null  )
+							                {
+							                	throw new AlreadyDeclaredException(Declaration.Function,(((DeclistContext)_localctx).funId!=null?((DeclistContext)_localctx).funId.getText():null),(((DeclistContext)_localctx).funId!=null?((DeclistContext)_localctx).funId.getLine():0));
+							                }
 						                
 					setState(155);
 					_errHandler.sync(this);
@@ -1272,8 +1267,7 @@ public class FOOLParser extends Parser {
 				             	entry=(symTable.get(j--)).get((((ValueContext)_localctx).id!=null?((ValueContext)_localctx).id.getText():null));
 				            }
 				            if (entry == null){
-				                System.out.println("Id "+(((ValueContext)_localctx).id!=null?((ValueContext)_localctx).id.getText():null)+" at line "+(((ValueContext)_localctx).id!=null?((ValueContext)_localctx).id.getLine():0)+" not declared");
-				                System.exit(0);
+				            	throw new NotDeclaredException((((ValueContext)_localctx).id!=null?((ValueContext)_localctx).id.getText():null),(((ValueContext)_localctx).id!=null?((ValueContext)_localctx).id.getLine():0));
 				            }
 				            //se non ci sono argomenti dopo l'id immagino che sia una variabile
 				            ((ValueContext)_localctx).ast =  new IdNode((((ValueContext)_localctx).id!=null?((ValueContext)_localctx).id.getText():null),entry,nestingLevel);

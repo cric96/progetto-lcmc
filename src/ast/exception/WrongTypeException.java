@@ -3,11 +3,10 @@ package ast.exception;
 import java.util.Objects;
 
 import ast.core.Type;
-
+/**
+ * quest'eccezione viene lanciata quando si trova un conflitto di tipo nella fase di parsing
+ */
 public class WrongTypeException extends Exception {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6539993742283487775L;
 	private final Type expectedType;
 	private final Type receivedType;

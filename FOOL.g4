@@ -9,6 +9,8 @@ import java.util.List;
 import ast.*;
 import ast.core.*;
 import ast.type.*;
+import ast.exception.*;
+import ast.operator.*;
 }
 
 //attributi della classe parser, verranno usati durante il parsing
@@ -110,9 +112,7 @@ declist returns [List<Node> astlist]:
                 final Map<String,STentry> hm = symTable.get(nestingLevel);
                 if (hm.put($id.text,new STentry(nestingLevel,$t.nodeType, --offset)) != null )
                 {
-                    //TODO METTI ECCEZIONI 
-                    System.out.println("Var id "+$id.text+" at line "+$id.line+" already declared");
-                    System.exit(0);
+                	throw new AlreadyDeclaredException(Declaration.Var,$id.text,$id.line);
                 }
             }
             | FUN funId=ID COLON retType=type {
@@ -120,12 +120,7 @@ declist returns [List<Node> astlist]:
                 $astlist.add(function);                              
                 Map<String,STentry> hm = symTable.get(nestingLevel);
                 final STentry entry = new STentry(nestingLevel,null,--offset);
-                if (hm.put($funId.text,entry) != null  )
-                {
-                    //TODO METTI ECCEZIONI 
-                    System.out.println("Fun id "+$funId.text+" at line "+$funId.line+" already declared");
-                    System.exit(0);
-                }
+                
                 //creare una nuova hashmap per la symTable
                 //RICORDA DI AGGIUNGERE IL NESTING LEVEL
                 nestingLevel++;
@@ -140,9 +135,7 @@ declist returns [List<Node> astlist]:
                     ParNode fpar = new ParNode($firstId.text,$firstType.nodeType); //creo nodo ParNode
                     function.addPar(fpar);                                 //lo attacco al FunNode con addPar
                     if ( hmn.put($firstId.text,new STentry(nestingLevel,$firstType.nodeType, parOffset ++)) != null  ){
-                        //TODO lancia eccezioni
-                        System.out.println("Parameter id "+$firstId.text+" at line "+$firstId.line+" already declared");
-                        System.exit(0);
+                        throw new AlreadyDeclaredException(Declaration.Parameter,$firstId.text,$firstId.line);
                     }
                   }
 	                (COMMA otherId=ID COLON otherType=hotype {
@@ -150,12 +143,14 @@ declist returns [List<Node> astlist]:
 	                   ParNode par = new ParNode($otherId.text,$otherType.nodeType); 
 	                   function.addPar(par);
 	                    if ( hmn.put($otherId.text,new STentry(nestingLevel,$otherType.nodeType, parOffset ++)) != null  ){
-	                        //TODO lancia eccezioni
-	                        System.out.println("Parameter id "+$id.text+" at line "+$id.line+" already declared");
-	                        System.exit(0);
+	                        throw new AlreadyDeclaredException(Declaration.Parameter,$otherId.text,$otherId.line);
 	                    }
 	                })*)? RPAR {
 	                    entry.addType(new ArrowType(parTypes,$retType.nodeType));
+	                    if (hm.put($funId.text,entry) != null  )
+		                {
+		                	throw new AlreadyDeclaredException(Declaration.Function,$funId.text,$funId.line);
+		                }
 	                }
                   (LET declarations = declist {function.addDec($declarations.astlist);} IN)? bodyExp=exp {
                       function.addBody($bodyExp.ast);
@@ -215,8 +210,7 @@ value returns [Node ast]
              	entry=(symTable.get(j--)).get($id.text);
             }
             if (entry == null){
-                System.out.println("Id "+$id.text+" at line "+$id.line+" not declared");
-                System.exit(0);
+            	throw new NotDeclaredException($id.text,$id.line);
             }
             //se non ci sono argomenti dopo l'id immagino che sia una variabile
             $ast= new IdNode($id.text,entry,nestingLevel);

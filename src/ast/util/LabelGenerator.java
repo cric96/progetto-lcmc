@@ -18,8 +18,7 @@ public class LabelGenerator {
 		return seed.toString() + (seed.next());
 	}
 
-	private LabelGenerator() {
-	}
+	private LabelGenerator() {}
 
 	/**
 	* Interfaccia che mi dà i diversi semi che posso associare a una label 
@@ -36,7 +35,14 @@ public class LabelGenerator {
 		 *enumerazione che offre semi di base
 		 */
 		public enum Standard implements GenerationSeed {
-			True("true"), Generic("label"), False("false"), IfTrue("ifTrue"), IfFalse("ifFalse");
+			Equal("equal"), 
+			LessEqual("lessequal"),
+			GreaterEqual("greaterequal"),
+			Not("not"),
+			Or("or"),
+			Generic("label"), 
+			IfTrue("ifTrue"), 
+			IfFalse("ifFalse");
 
 			private final String myName;
 			private int nextNum;
