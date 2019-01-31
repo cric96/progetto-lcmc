@@ -6,7 +6,6 @@ import ast.exception.WrongTypeException;
 import ast.type.BoolType;
 import ast.util.LabelGenerator;
 import ast.util.LabelGenerator.GenerationSeed;
-import lib.FOOLlib;
 
 public class IfNode implements Node {
 
@@ -25,14 +24,14 @@ public class IfNode implements Node {
 	}
 
 	public Type typeCheck() throws WrongTypeException {
-		if (!(FOOLlib.isSubtype(cond.typeCheck(), BoolType.instance()))) {
+		if (!(cond.typeCheck().isSubtype(BoolType.instance()))) {
 			throw new WrongTypeException("non boolean condition in if");
 		}
 		final Type then = th.typeCheck();
 		final Type e = el.typeCheck();
-		if (FOOLlib.isSubtype(then, e))
+		if (then.isSubtype(e))
 			return e;
-		if (FOOLlib.isSubtype(e, then))
+		if (e.isSubtype(then))
 			return then;
 		throw new WrongTypeException("Incompatible types in then-else branches");
 	}

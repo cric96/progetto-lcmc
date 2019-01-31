@@ -1,4 +1,4 @@
-let
+/*let
   var x:int = 5+3;
   fun f:bool (n:int, m:int)
     let 
@@ -11,3 +11,6 @@ in
      else { 10 }
   ) 
 ;
+*/
+
+print(3-(2));

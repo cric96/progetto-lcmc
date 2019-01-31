@@ -165,13 +165,14 @@ declist returns [List<Node> astlist]:
           )+
         ;
 
+//si associa a sx ma hanno maggiore precedenza quelli scritti più in basso (factor > term > exp)
 exp	returns [Node ast] 
     : first=term 
     {
         $ast = $first.ast;
     }
         ( PLUS other=term {$ast = new PlusNode($ast, $other.ast);}
-           | MINUS other=term {$ast = null;} //DA FARE
+           | MINUS other=term {$ast = new MinusNode($ast, $other.ast);}
            | OR other=term {$ast = null; }//DA FARE
            )* 
     ;  

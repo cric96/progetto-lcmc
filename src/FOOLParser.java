@@ -839,7 +839,7 @@ public class FOOLParser extends Parser {
 					match(MINUS);
 					setState(175);
 					((ExpContext)_localctx).other = term();
-					((ExpContext)_localctx).ast =  null;
+					((ExpContext)_localctx).ast =  new MinusNode(_localctx.ast, ((ExpContext)_localctx).other.ast);
 					}
 					break;
 				case OR:

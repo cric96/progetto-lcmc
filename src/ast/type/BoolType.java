@@ -18,4 +18,9 @@ public class BoolType implements Type {
 	public String toString() {
 		return "BoolType";
 	}
+
+	@Override
+	public boolean isSubtype(Type type) {
+		return type == IntType.instance() || type == BOOL_TYPE;
+	}
 }

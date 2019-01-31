@@ -46,7 +46,7 @@ public class FunNode implements Node {
 		for (final Node dec : declist) {
 			dec.typeCheck();
 		}
-		if (!FOOLlib.isSubtype(exp.typeCheck(), type)) {
+		if (!exp.typeCheck().isSubtype(type)) {
 			throw new WrongTypeException("Incompatible value for variable",type,exp.typeCheck());
 		}
 		return null;
@@ -58,9 +58,9 @@ public class FunNode implements Node {
 		final String popParl = parlist.stream().map(x -> "pop\n").collect(Collectors.joining());
 		final String declCode = declist.stream().map(Node::codeGeneration).collect(Collectors.joining());
 		
-		String funl = LabelGenerator.generate(GenerationSeed.Function(id));
+		String funl = LabelGenerator.generate(GenerationSeed.createFunctionSeed(id));
 
-		FOOLlib.putCode(funl + ":\n" + "cfp\n" + // setta $fp a $sp
+		FOOLlib.putFunctionCode(funl + ":\n" + "cfp\n" + // setta $fp a $sp
 				"lra\n" + // inserisce return address
 				declCode + // inresisce dichiarazioni locali
 				exp.codeGeneration() + "srv\n" + // pop del return value

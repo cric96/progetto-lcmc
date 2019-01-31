@@ -8,8 +8,9 @@ import ast.core.STentry;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
 import ast.type.ArrowType;
-import lib.FOOLlib;
-
+/**
+ * Rappresenta il nodo derivante da una chiamata a funzione
+ */
 public class CallNode implements Node {
 
 	private final String id;
@@ -32,17 +33,17 @@ public class CallNode implements Node {
 	public Type typeCheck() throws WrongTypeException {
 		if (!(entry.getType() instanceof ArrowType)) {
 			throw new WrongTypeException("Invocation of a non-function " + id);
-
 		}
 		final ArrowType t = (ArrowType) entry.getType();
 		final List<Type> p = t.getParList();
 		if (!(p.size() == parlist.size())) {
 			throw new WrongTypeException("Wrong number of parameters in the invocation of " + id);
 		}
-		for (int i = 0; i < parlist.size(); i++)
-			if (!(FOOLlib.isSubtype((parlist.get(i)).typeCheck(), p.get(i)))) {
+		for (int i = 0; i < parlist.size(); i++) {
+			if (!(parlist.get(i)).typeCheck().isSubtype((p.get(i)))) {
 				throw new WrongTypeException("Wrong type for " + (i + 1) + "-th parameter of " + id, parlist.get(i).typeCheck(), p.get(i));
 			}
+		}
 		return t.getReturnType();
 	}
 

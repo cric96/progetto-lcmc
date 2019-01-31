@@ -18,4 +18,9 @@ public class IntType implements Type {
 	public String toString() {
 		return "IntType";
 	}
+
+	@Override
+	public boolean isSubtype(Type type) {
+		return type == INT_TYPE;
+	}
 }

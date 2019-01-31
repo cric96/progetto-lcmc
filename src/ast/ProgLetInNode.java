@@ -35,7 +35,7 @@ public class ProgLetInNode implements Node {
 
 	public String codeGeneration() {
 		String declCode = declarationList.stream().map(Node::codeGeneration).collect(Collectors.joining());
-		return "push 0\n" + declCode + exp.codeGeneration() + "halt\n" + FOOLlib.getCode();
+		return "push 0\n" + declCode + exp.codeGeneration() + "halt\n" + FOOLlib.getFunctionCode();
 	}
 
 }

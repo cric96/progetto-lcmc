@@ -3,7 +3,6 @@ package ast;
 import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
-import lib.FOOLlib;
 
 public class VarNode implements Node {
 
@@ -22,7 +21,7 @@ public class VarNode implements Node {
 	}
 
 	public Type typeCheck() throws WrongTypeException {
-		if (!FOOLlib.isSubtype(exp.typeCheck(), type)) {
+		if (!exp.typeCheck().isSubtype(type)) {
 			throw new WrongTypeException("Incompatible value for variable: " + id, type, exp.typeCheck());
 		}
 		return null;

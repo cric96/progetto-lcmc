@@ -6,7 +6,6 @@ import ast.exception.WrongTypeException;
 import ast.type.BoolType;
 import ast.util.LabelGenerator;
 import ast.util.LabelGenerator.GenerationSeed;
-import lib.FOOLlib;
 
 public class EqualNode implements Node {
 
@@ -25,7 +24,7 @@ public class EqualNode implements Node {
 	public Type typeCheck() throws WrongTypeException {
 		final Type l = left.typeCheck();
 		final Type r = right.typeCheck();
-		if (!(FOOLlib.isSubtype(l, r) || FOOLlib.isSubtype(r, l))) {
+		if (!(l.isSubtype(r) || r.isSubtype(l))) {
 			throw new WrongTypeException("Incompatible types in equal");
 		}
 		return BoolType.instance();

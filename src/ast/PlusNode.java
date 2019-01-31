@@ -4,7 +4,6 @@ import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
 import ast.type.IntType;
-import lib.*;
 
 public class PlusNode implements Node {
 
@@ -27,7 +26,7 @@ public class PlusNode implements Node {
 	}
 
 	private void checkCorrectness(final Node node) throws WrongTypeException {
-		if (!(FOOLlib.isSubtype(node.typeCheck(), IntType.instance()))) {
+		if (!(node.typeCheck().isSubtype(IntType.instance()))) {
 			throw new WrongTypeException("Non integers in sum", IntType.instance(), node.typeCheck());
 		}
 	}

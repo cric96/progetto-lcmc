@@ -45,5 +45,22 @@ public class ArrowType implements Type {
 	public String toString() {
 		return parlist.stream().map(Type::toString).collect(Collectors.joining(",", "(", ")")) + " -> " + ret;
 	}
+	@Override
+	public boolean isSubtype(Type type) {
+		if (!(type instanceof ArrowType)) {
+			return false;
+		}
+		final ArrowType t = (ArrowType)type;
+		final List<Type> p = t.getParList();
+		if (!(p.size() == parlist.size())) {
+			return false;
+		}
+		for (int i = 0; i < parlist.size(); i++) {
+			if (!(parlist.get(i)).isSubtype((p.get(i)))) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 }
