@@ -13,4 +13,4 @@ in
 ;
 */
 
-print(3-(2));
+print(!(false));

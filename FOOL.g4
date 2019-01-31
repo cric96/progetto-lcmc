@@ -173,7 +173,7 @@ exp	returns [Node ast]
     }
         ( PLUS other=term {$ast = new PlusNode($ast, $other.ast);}
            | MINUS other=term {$ast = new MinusNode($ast, $other.ast);}
-           | OR other=term {$ast = null; }//DA FARE
+           | OR other=term {$ast = new OrNode($ast, $other.ast); }
            )* 
     ;  
 
@@ -182,7 +182,7 @@ term returns [Node ast]
         $ast = $firstFactor.ast;
     }
         ( TIMES other=factor { $ast = new MultNode ($ast, $other.ast); }
-  	             | DIV  factor {$ast = null;}
+  	             | DIV  other=factor {$ast = new DivNode ($ast, $other.ast);}
   	             | AND  factor {$ast = null;}
   	             )*
   	    ;
@@ -204,7 +204,7 @@ value returns [Node ast]
 	    | NULL {$ast = null;} //da fare 
 	    | NEW ID LPAR (exp (COMMA exp)* )? RPAR {$ast = null; } // da fare        
 	    | IF c=exp THEN CLPAR th=exp CRPAR ELSE CLPAR e=exp CRPAR {$ast = new IfNode($c.ast, $th.ast, $e.ast);}
-	    | NOT LPAR exp RPAR {$ast = null; } // da fare
+	    | NOT LPAR e=exp RPAR {$ast = new NotNode($e.ast); } 
 	    | PRINT LPAR e=exp RPAR {$ast = new PrintNode($e.ast);}
         | LPAR e=exp RPAR {$ast = $e.ast;}
 	    | id=ID {

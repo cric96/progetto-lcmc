@@ -848,7 +848,7 @@ public class FOOLParser extends Parser {
 					match(OR);
 					setState(179);
 					((ExpContext)_localctx).other = term();
-					((ExpContext)_localctx).ast =  null; 
+					((ExpContext)_localctx).ast =  new OrNode(_localctx.ast, ((ExpContext)_localctx).other.ast); 
 					}
 					break;
 				default:
@@ -934,8 +934,8 @@ public class FOOLParser extends Parser {
 					setState(193);
 					match(DIV);
 					setState(194);
-					factor();
-					((TermContext)_localctx).ast =  null;
+					((TermContext)_localctx).other = factor();
+					((TermContext)_localctx).ast =  new DivNode (_localctx.ast, ((TermContext)_localctx).other.ast);
 					}
 					break;
 				case AND:
@@ -1228,10 +1228,10 @@ public class FOOLParser extends Parser {
 				setState(261);
 				match(LPAR);
 				setState(262);
-				exp();
+				((ValueContext)_localctx).e = exp();
 				setState(263);
 				match(RPAR);
-				((ValueContext)_localctx).ast =  null; 
+				((ValueContext)_localctx).ast =  new NotNode(((ValueContext)_localctx).e.ast); 
 				}
 				break;
 			case PRINT:
