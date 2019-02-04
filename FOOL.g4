@@ -2,10 +2,7 @@ grammar FOOL;
 
 //header: serve per importare i package nel SVM parser (definisco quali package il parser avrà bisogno di usare)
 @header{
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 import ast.*;
 import ast.core.*;
 import ast.type.*;
@@ -16,11 +13,11 @@ import ast.operator.*;
 //attributi della classe parser, verranno usati durante il parsing
 @parser::members{
 	//TODO ricorda di mettere il concetto di symbol table
-	private int nestingLevel = 0;
-	private List<Map<String,STentry>> symTable = new ArrayList<Map<String,STentry>>();
+	private SymbolTable symTable = new StandardSymbolTable();
 	//livello ambiente con dichiarazioni piu' esterno è 0 (prima posizione ArrayList) invece che 1 (slides)
 	//il "fronte" della lista di tabelle è symTable.get(nestingLevel)
 }
+
 
 @lexer::members {
 	int lexicalErrors=0;
@@ -48,12 +45,6 @@ import ast.operator.*;
  * nella parte in invece si possono usare le funzioni e classi definite nella parte let
  */
 prog returns [Node ast] : 
-    {
-    	//all'inizio si inizializza la symbol table con una entry vuota, definisce il livello globale
-        final Map<String,STentry> hm = new HashMap<String,STentry> ();
-       	symTable.add(hm);    
-    }
-    
     ( 
     	//in questo caso il programma è del tipo let ... in ...
     	LET ( 
@@ -94,7 +85,7 @@ cllist returns [List<Node> classes]: ( CLASS ID (EXTENDS ID)? LPAR (ID COLON typ
 /*
  * questa variabile viene utilizzata per identificare l'insieme di dichiarazione effettuate nella parte   
  */
-declist returns [List<Node> astlist]:
+declist returns [List<DeclarationNode> astlist]:
 	/*
 	 * astlist sono l'insieme di variabili e funzioni dichiarate in una parte di let
 	 * le variabili globali nello stack crescono verso verso il basso (per questo motivo si
@@ -104,61 +95,74 @@ declist returns [List<Node> astlist]:
         $astlist = new ArrayList<>();
         int offset = -1;
     }
-    
-    (( VAR id=ID COLON t=hotype ASS e=exp {
-                final VarNode var = new VarNode($id.text,$t.nodeType, $e.ast);
-                $astlist.add(var);
-                //cerca di fare meglio qua!
-                final Map<String,STentry> hm = symTable.get(nestingLevel);
-                if (hm.put($id.text,new STentry(nestingLevel,$t.nodeType, --offset)) != null )
-                {
-                	throw new AlreadyDeclaredException(Declaration.Var,$id.text,$id.line);
+    //in questo sto dichiarando una variabile
+    ((VAR id=ID COLON t=hotype ASS e=exp {
+    		//creo il nodo associato alla variabile che sto dichiarando
+            final VarNode var = new VarNode($id.text,$t.nodeType, $e.ast);
+            //aggiungo alla declarations list la variabile
+            $astlist.add(var);
+            //aggiungo la dichiarazione della variabile nella symbol table
+            if (!symTable.addEntry($id.text,$t.nodeType, --offset))
+            {
+            	throw new AlreadyDeclaredException(Declaration.Var,$id.text,$id.line);
+            }
+            //se var è di tipo funzionale allora occuperà offset doppio
+            if(var.getSymbolType() instanceof ArrowType) {
+            	offset--;
+            }
+        }
+        //in questo caso sto dichiarando una funzione
+        | FUN funId=ID COLON retType=type {
+        	//creo il function node associato
+            final FunNode function = new FunNode($funId.text,$retType.nodeType);     
+            //aggiungo alla declarations list la funzione appena dichiarata 
+            $astlist.add(function);
+            //valori che mi serivaranno per aggiungere l'entry nella symbol table
+            final int functionNesting = symTable.getNesting();
+            final int functionOffset = --offset;
+            offset--; //decremento ulteriormente l'offset perché le funzioni occupano offset doppio
+            //sto entrando dentro la funzione quindi devo aumentare il nesting level della symbol table
+            symTable.increaseNesting();
+        }
+            LPAR {
+            	//parTypes è l'insieme di parametri della funzione
+                List<Type> parTypes = new ArrayList<Type>();
+                //offset parte da 1 e cresce
+          	    int parOffset = 1;
+            } (firstId=ID COLON firstType=hotype {
+            	//aggiungo un parametro alla dichiarazione di funzioni
+                parTypes.add($firstType.nodeType);
+                ParNode fpar = new ParNode($firstId.text,$firstType.nodeType); //creo nodo ParNode
+                function.addPar(fpar);                                 //lo attacco al FunNode con addPar
+                //se il parametro era di tipo funzionale occupa doppio offset
+                parOffset = fpar.getSymbolType() instanceof ArrowType ? parOffset + 1 : parOffset;
+                if (!symTable.addEntry($firstId.text,$firstType.nodeType, parOffset ++)){
+                    throw new AlreadyDeclaredException(Declaration.Parameter,$firstId.text,$firstId.line);
                 }
-            }
-            | FUN funId=ID COLON retType=type {
-                final FunNode function = new FunNode($funId.text,$retType.nodeType);      
-                $astlist.add(function);                              
-                Map<String,STentry> hm = symTable.get(nestingLevel);
-                final STentry entry = new STentry(nestingLevel,null,--offset);
                 
-                //creare una nuova hashmap per la symTable
-                //RICORDA DI AGGIUNGERE IL NESTING LEVEL
-                nestingLevel++;
-                Map<String,STentry> hmn = new HashMap<String,STentry> ();
-                symTable.add(hmn);
-            }
-                LPAR {
-                    List<Type> parTypes = new ArrayList<Type>();
-              	    int parOffset = 1;
-                } (firstId=ID COLON firstType=hotype {
-                    parTypes.add($firstType.nodeType);
-                    ParNode fpar = new ParNode($firstId.text,$firstType.nodeType); //creo nodo ParNode
-                    function.addPar(fpar);                                 //lo attacco al FunNode con addPar
-                    if ( hmn.put($firstId.text,new STentry(nestingLevel,$firstType.nodeType, parOffset ++)) != null  ){
-                        throw new AlreadyDeclaredException(Declaration.Parameter,$firstId.text,$firstId.line);
-                    }
-                  }
-	                (COMMA otherId=ID COLON otherType=hotype {
-	                   parTypes.add($otherType.nodeType);
-	                   ParNode par = new ParNode($otherId.text,$otherType.nodeType); 
-	                   function.addPar(par);
-	                    if ( hmn.put($otherId.text,new STentry(nestingLevel,$otherType.nodeType, parOffset ++)) != null  ){
-	                        throw new AlreadyDeclaredException(Declaration.Parameter,$otherId.text,$otherId.line);
-	                    }
-	                })*)? RPAR {
-	                    entry.addType(new ArrowType(parTypes,$retType.nodeType));
-	                    if (hm.put($funId.text,entry) != null  )
-		                {
-		                	throw new AlreadyDeclaredException(Declaration.Function,$funId.text,$funId.line);
-		                }
+              }
+                (COMMA otherId=ID COLON otherType=hotype {
+                   parTypes.add($otherType.nodeType);
+                   ParNode par = new ParNode($otherId.text,$otherType.nodeType); 
+                   function.addPar(par);
+                    if (!symTable.addEntry($otherId.text,$otherType.nodeType, parOffset ++)){
+                    	throw new AlreadyDeclaredException(Declaration.Parameter,$firstId.text,$firstId.line);
+                	}
+                	//se il parametro era di tipo funzionale occupa doppio offset
+                	parOffset = fpar.getSymbolType() instanceof ArrowType ? parOffset + 1 : parOffset;
+                })*)? RPAR {
+                	//a questo punto posso definire il tipo della funzione e di conseguenza lo aggiungerò alla symbol table
+                	final Type funType = new ArrowType(parTypes,$retType.nodeType);
+	                if(!symTable.addEntryIn($funId.text,funType,functionOffset,functionNesting)){
+	                	throw new AlreadyDeclaredException(Declaration.Function,$funId.text,$funId.line);
 	                }
-                  (LET declarations = declist {function.addDec($declarations.astlist);} IN)? bodyExp=exp {
-                      function.addBody($bodyExp.ast);
-                      symTable.remove(nestingLevel--);
-                  } 
-            ) SEMIC 
-          )+
-        ;
+                }
+              (LET declarations = declist {function.addDec($declarations.astlist);} IN)? bodyExp=exp {
+                  function.addBody($bodyExp.ast);
+                  symTable.decreaseNesting();
+              } 
+        ) SEMIC 
+      )+;
 
 //si associa a sx ma hanno maggiore precedenza quelli scritti più in basso (factor > term > exp)
 exp	returns [Node ast] 
@@ -203,17 +207,22 @@ value returns [Node ast]
 	    | NOT LPAR e=exp RPAR {$ast = new NotNode($e.ast); } 
 	    | PRINT LPAR e=exp RPAR {$ast = new PrintNode($e.ast);}
         | LPAR e=exp RPAR {$ast = $e.ast;}
+        /*
+         * se incontro un id devo cercare nella symbol table se 
+         * è l'id utilizzato è già stato dichiarato, in questo caso
+         * posso verificare se sia una variabile, una funzione e 
+         * un oggetto
+         */
 	    | id=ID {
-            int j = nestingLevel;
-            STentry entry = null;
-            while (j>=0 && entry==null) {
-             	entry=(symTable.get(j--)).get($id.text);
-            }
-            if (entry == null){
+	    	//vado a ricercare l'entry associata all'id 
+	    	final Optional<STentry> entry = symTable.findEntryById($id.text);
+	    	//nel caso che non sia presente lancio l'eccezione not declared
+            if (!entry.isPresent()){
             	throw new NotDeclaredException($id.text,$id.line);
             }
             //se non ci sono argomenti dopo l'id immagino che sia una variabile
-            $ast= new IdNode($id.text,entry,nestingLevel);
+            $ast= new IdNode($id.text,entry.get(),symTable.getNesting());
+            //in arguments metterò l'insieme di valori trovati nella chiamata di funzione (o nel caso sia un oggetto nella chiamata a metodo)
             final List<Node> arguments = new ArrayList<Node>();
         }
         //in questa parte vuol dire che sta provando ad effettuare una chiamata a funzione
@@ -222,7 +231,7 @@ value returns [Node ast]
         }(COMMA other=exp {
             arguments.add($other.ast);
         })* )? RPAR {
-        	$ast= new CallNode($id.text,entry,arguments,nestingLevel);
+        	$ast= new CallNode($id.text,entry.get(),arguments,symTable.getNesting());
         }
         //in questo punto invece sto usando id come se fosse un oggetto
              | DOT ID LPAR (exp (COMMA exp)* )? RPAR 
@@ -230,8 +239,7 @@ value returns [Node ast]
         ; 
                
 hotype returns [Type nodeType] : t=type {$nodeType = $t.nodeType;} 
-		//DA FARE
-        | arrow
+        | a=arrow {$nodeType = $a.nodeType;}
         ;
 
 type returns [Type nodeType]
@@ -241,7 +249,10 @@ type returns [Type nodeType]
  	    | ID                   
  	    ;  
  	 //DA FARE
-arrow returns [Type nodeType] : LPAR (hotype (COMMA hotype)* )? RPAR ARROW type;          
+arrow returns [Type nodeType] : {final List<Type> parameterList = new ArrayList<>();}
+								LPAR (firstParameter=hotype {parameterList.add($firstParameter.nodeType);}
+									(COMMA otherParameter=hotype {parameterList.add($otherParameter.nodeType);})*
+								)? RPAR ARROW returnType=type {$nodeType = new ArrowType(parameterList, $returnType.nodeType);};          
 		  
 /*------------------------------------------------------------------
  * LEXER RULES

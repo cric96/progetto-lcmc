@@ -32,8 +32,13 @@ public class StandardSymbolTable implements SymbolTable {
 	}
 
 	@Override
-	public boolean addEntry(String id, STentry entry) {
-		return current.put(id,entry) != null;
+	public boolean addEntry(final String id, final Type type, final int offset) {
+		return current.put(id,new STentry(nestingLevel, type, offset)) == null;
+	}
+	
+	@Override
+	public boolean addEntryIn(String id, final Type type, final int offset, int nesting) {
+		return symTable.get(nesting).put(id,new STentry(nesting, type, offset)) == null;
 	}
 
 	@Override
@@ -53,5 +58,5 @@ public class StandardSymbolTable implements SymbolTable {
         }
 		return returnValue;
 	}
-
+	
 }

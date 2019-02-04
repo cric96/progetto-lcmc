@@ -6,25 +6,17 @@ package ast.core;
  */
 public class STentry {
 
-	private final int nl;
-	private Type type;
-	private final int offset; //TODO DA RIVEDERE
+	private final int nestingLevel;
+	private final Type type;
+	private final int offset; 
 
-	public STentry(int n, int os) {
-		nl = n;
-		offset = os;
+	public STentry(int nestingLevel, Type type, int offset) {
+		super();
+		this.nestingLevel = nestingLevel;
+		this.type = type;
+		this.offset = offset;
 	}
-
-	public STentry(int n, Type t, int os) {
-		nl = n;
-		type = t;
-		offset = os;
-	}
-
-	public void addType(Type t) {
-		type = t;
-	}
-
+	
 	public Type getType() {
 		return type;
 	}
@@ -34,11 +26,11 @@ public class STentry {
 	}
 
 	public int getNestinglevel() {
-		return nl;
+		return nestingLevel;
 	}
 
 	public String toPrint(String s) {
-		return s + "STentry: nestlev " + Integer.toString(nl) + "\n" + s + "STentry: type\n " + type.toPrint(s + "  ")
+		return s + "STentry: nestlev " + Integer.toString(nestingLevel) + "\n" + s + "STentry: type\n " + type.toPrint(s + "  ")
 				+ s + "STentry: offset " + offset + "\n";
 	}
 

@@ -11,7 +11,6 @@ public interface Node {
 	 */
 	String toPrint(String indent);
 	
-	//TODO DA RIVEDERE
 	/**
 	 fa il type checking e ritorna:
 	 per una espressione, il suo tipo (oggetto BoolType, IntType, ...)

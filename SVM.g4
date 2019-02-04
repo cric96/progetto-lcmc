@@ -12,7 +12,7 @@ int lexicalErrors=0;
       
     int[] code = new int[ExecuteVM.CODESIZE];    
     private int i = 0;
-    private HashMap<String,Integer> labelAdd = new HashMap<String,Integer>();
+    private HashMap<String,Integer> labelAddress = new HashMap<String,Integer>();
     private HashMap<Integer,String> labelRef = new HashMap<Integer,String>();
         
 }
@@ -22,38 +22,37 @@ int lexicalErrors=0;
  *------------------------------------------------------------------*/
   
 assembly: 
-    ( PUSH n=NUMBER   {code[i++] = PUSH; 
-			                 code[i++] = Integer.parseInt($n.text);}
-	  | PUSH l=LABEL    {code[i++] = PUSH; //
-	    		             labelRef.put(i++,$l.text);} 		     
-	  | POP		    {code[i++] = POP;}	
-	  | ADD		    {code[i++] = ADD;}
-	  | SUB		    {code[i++] = SUB;}
-	  | MULT	    {code[i++] = MULT;}
-	  | DIV		    {code[i++] = DIV;}
-	  | STOREW	  {code[i++] = STOREW;} //
-	  | LOADW           {code[i++] = LOADW;} //
-	  | l=LABEL COL     {labelAdd.put($l.text,i);}
-	  | BRANCH l=LABEL  {code[i++] = BRANCH;
-                       labelRef.put(i++,$l.text);}
-	  | BRANCHEQ l=LABEL {code[i++] = BRANCHEQ; //
-                        labelRef.put(i++,$l.text);}
-	  | BRANCHLESSEQ l=LABEL {code[i++] = BRANCHLESSEQ;
-                          labelRef.put(i++,$l.text);}
-	  | JS              {code[i++] = JS;}		     //
-	  | LOADRA          {code[i++] = LOADRA;}    //
-	  | STORERA         {code[i++] = STORERA;}   //
-	  | LOADRV          {code[i++] = LOADRV;}   //
-	  | STORERV         {code[i++] = STORERV;}    //
-	  | LOADFP          {code[i++] = LOADFP;}   //
-	  | STOREFP         {code[i++] = STOREFP;}   //
-	  | COPYFP          {code[i++] = COPYFP;}   //
-	  | LOADHP          {code[i++] = LOADHP;}   //
-	  | STOREHP         {code[i++] = STOREHP;}   //
-	  | PRINT           {code[i++] = PRINT;}
-	  | HALT            {code[i++] = HALT;}
+    ( PUSH number=NUMBER	{code[i++] = PUSH; code[i++] = Integer.parseInt($number.text);} //push NUMBER on the stack 
+	  | PUSH label=LABEL {code[i++] = PUSH; labelRef.put(i++,$label.text);}	//push the location address pointed by LABEL on the stack	     
+	  | POP	{code[i++] = POP;}	//pop the top of the stack 
+	  | ADD	{code[i++] = ADD;}	//replace the two values on top of the stack with their sum
+	  | SUB	{code[i++] = SUB;}	//pop the two values v1 and v2 (respectively) and push v2-v1
+	  | MULT {code[i++] = MULT;}	//replace the two values on top of the stack with their product	
+	  | DIV	{code[i++] = DIV;}	//pop the two values v1 and v2 (respectively) and push v2/v1
+	  | STOREW {code[i++] = STOREW;}	///pop two values: 
+	  		//  the second one is written at the memory address pointed by the first one
+	  | LOADW {code[i++] = LOADW;}      ///read the content of the memory cell pointed by the top of the stack
+	                //  and replace the top of the stack with such value
+	  | label=LABEL COL  {labelAddress.put($label.text, i);} //LABEL points at the location of the subsequent instruction! NON OCCUPA SPAZIO NEL MIO ARRAY!  una dichiarazione di una label!
+	  | BRANCH label=LABEL {code[i++] = BRANCH; labelRef.put(i++,$label.text);}      //jump at the instruction pointed by LABEL
+	  | BRANCHEQ label=LABEL {code[i++] = BRANCHEQ; labelRef.put(i++,$label.text);}   ///pop two values and jump if they are equal
+	  | BRANCHLESSEQ label=LABEL {code[i++] = BRANCHLESSEQ; labelRef.put(i++,$label.text);}  //pop two values and jump if the second one is less or equal to the first one
+	  | JS  {code[i++] = JS;}             ///pop one value from the stack:
+	  		      					      ///copy the instruction pointer in the RA register and jump to the popped value
+	  		      					      ///this instruction is used with function     
+	  | LOADRA   {code[i++] = LOADRA;}    ///push in the stack the content of the RA register   
+	  | STORERA  {code[i++] = STORERA;}   ///pop the top of the stack and copy it in the RA register     
+	  | LOADRV   {code[i++] = LOADRV;}    ///push in the stack the content of the RV register    
+	  | STORERV  {code[i++] = STORERV;}   ///pop the top of the stack and copy it in the RV register    
+	  | LOADFP   {code[i++] = LOADFP;}    ///push in the stack the content of the FP register   
+	  | STOREFP  {code[i++] = STOREFP;}   ///pop the top of the stack and copy it in the FP register    
+	  | COPYFP   {code[i++] = COPYFP;}    ///copy in the FP register the current stack pointer    
+	  | LOADHP   {code[i++] = LOADHP;}    ///push in the stack the content of the HP register    
+	  | STOREHP  {code[i++] = STOREHP;}   ///pop the top of the stack and copy it in the HP register    
+	  | PRINT {code[i++] = PRINT;}        //visualize the top of the stack without removing it   
+	  | HALT  {code[i++] = HALT;}         //terminate the execution
 	  )* { for (Integer refAdd: labelRef.keySet()) {
-	              code[refAdd]=labelAdd.get(labelRef.get(refAdd));
+	              code[refAdd]=labelAddress.get(labelRef.get(refAdd));
 		     } 
 		   } ;
 
@@ -62,7 +61,7 @@ assembly:
  * LEXER RULES
  *------------------------------------------------------------------*/
 
-PUSH	 : 'push' ; 	
+PUSH	 : 'push' ; //push NUMBER on the stack	
 POP	 : 'pop' ; 	
 ADD	 : 'add' ;  	
 SUB	 : 'sub' ;	

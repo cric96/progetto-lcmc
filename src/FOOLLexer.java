@@ -1,9 +1,6 @@
 // Generated from FOOL.g4 by ANTLR 4.7
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 import ast.*;
 import ast.core.*;
 import ast.type.*;

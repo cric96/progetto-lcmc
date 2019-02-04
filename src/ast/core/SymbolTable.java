@@ -14,10 +14,20 @@ public interface SymbolTable {
 	/**
 	 * prova ad aggiungere un'entry nella symbol table
 	 * @param id, l'id dell'entry
-	 * @param entry, aggiuge un entry nella tabella
+	 * @param type, il tipo associato all'id
+	 * @param offset, offset usato a runtime per riuscire a trovare il giusto valore nello stack
 	 * @return true se non è presente già un id in questo livello, false altrimenti
 	 */
-	boolean addEntry(String id, STentry entry);
+	boolean addEntry(String id, Type type, int offset);
+	/**
+	 * prova ad aggiungere un'entry nella symbol table nel nestring level passato
+	 * @param id l'id del node
+	 * @param type, il tipo associato all'id
+	 * @param offset, offset usato a runtime per riuscire a trovare il giusto valore nello stack
+	 * @param nesting il nesting level 
+	 * @return true se non è presente già un id in questo livello, false altrimenti
+	 */
+	boolean addEntryIn(String id, Type type, int offset, int nesting);
 	/**
 	 * @return il corrente livello di nesting
 	 */

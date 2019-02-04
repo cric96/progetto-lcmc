@@ -3,6 +3,7 @@ package ast.operator;
 import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
+import ast.type.ArrowType;
 import ast.type.BoolType;
 import ast.util.LabelGenerator;
 import ast.util.LabelGenerator.GenerationSeed;
@@ -26,6 +27,9 @@ public class EqualNode implements Node {
 		final Type r = right.typeCheck();
 		if (!(l.isSubtype(r) || r.isSubtype(l))) {
 			throw new WrongTypeException("Incompatible types in equal");
+		}
+		if(l instanceof ArrowType || r instanceof ArrowType) {
+			throw new WrongTypeException("No arrowType admitted in equal operation");
 		}
 		return BoolType.instance();
 	}

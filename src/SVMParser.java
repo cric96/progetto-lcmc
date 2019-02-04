@@ -89,7 +89,7 @@ public class SVMParser extends Parser {
 	      
 	    int[] code = new int[ExecuteVM.CODESIZE];    
 	    private int i = 0;
-	    private HashMap<String,Integer> labelAdd = new HashMap<String,Integer>();
+	    private HashMap<String,Integer> labelAddress = new HashMap<String,Integer>();
 	    private HashMap<Integer,String> labelRef = new HashMap<Integer,String>();
 	        
 
@@ -98,8 +98,8 @@ public class SVMParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 	public static class AssemblyContext extends ParserRuleContext {
-		public Token n;
-		public Token l;
+		public Token number;
+		public Token label;
 		public List<TerminalNode> PUSH() { return getTokens(SVMParser.PUSH); }
 		public TerminalNode PUSH(int i) {
 			return getToken(SVMParser.PUSH, i);
@@ -230,9 +230,8 @@ public class SVMParser extends Parser {
 					setState(2);
 					match(PUSH);
 					setState(3);
-					((AssemblyContext)_localctx).n = match(NUMBER);
-					code[i++] = PUSH; 
-								                 code[i++] = Integer.parseInt((((AssemblyContext)_localctx).n!=null?((AssemblyContext)_localctx).n.getText():null));
+					((AssemblyContext)_localctx).number = match(NUMBER);
+					code[i++] = PUSH; code[i++] = Integer.parseInt((((AssemblyContext)_localctx).number!=null?((AssemblyContext)_localctx).number.getText():null));
 					}
 					break;
 				case 2:
@@ -240,9 +239,8 @@ public class SVMParser extends Parser {
 					setState(5);
 					match(PUSH);
 					setState(6);
-					((AssemblyContext)_localctx).l = match(LABEL);
-					code[i++] = PUSH; //
-						    		             labelRef.put(i++,(((AssemblyContext)_localctx).l!=null?((AssemblyContext)_localctx).l.getText():null));
+					((AssemblyContext)_localctx).label = match(LABEL);
+					code[i++] = PUSH; labelRef.put(i++,(((AssemblyContext)_localctx).label!=null?((AssemblyContext)_localctx).label.getText():null));
 					}
 					break;
 				case 3:
@@ -297,10 +295,10 @@ public class SVMParser extends Parser {
 				case 10:
 					{
 					setState(22);
-					((AssemblyContext)_localctx).l = match(LABEL);
+					((AssemblyContext)_localctx).label = match(LABEL);
 					setState(23);
 					match(COL);
-					labelAdd.put((((AssemblyContext)_localctx).l!=null?((AssemblyContext)_localctx).l.getText():null),i);
+					labelAddress.put((((AssemblyContext)_localctx).label!=null?((AssemblyContext)_localctx).label.getText():null), i);
 					}
 					break;
 				case 11:
@@ -308,9 +306,8 @@ public class SVMParser extends Parser {
 					setState(25);
 					match(BRANCH);
 					setState(26);
-					((AssemblyContext)_localctx).l = match(LABEL);
-					code[i++] = BRANCH;
-					                       labelRef.put(i++,(((AssemblyContext)_localctx).l!=null?((AssemblyContext)_localctx).l.getText():null));
+					((AssemblyContext)_localctx).label = match(LABEL);
+					code[i++] = BRANCH; labelRef.put(i++,(((AssemblyContext)_localctx).label!=null?((AssemblyContext)_localctx).label.getText():null));
 					}
 					break;
 				case 12:
@@ -318,9 +315,8 @@ public class SVMParser extends Parser {
 					setState(28);
 					match(BRANCHEQ);
 					setState(29);
-					((AssemblyContext)_localctx).l = match(LABEL);
-					code[i++] = BRANCHEQ; //
-					                        labelRef.put(i++,(((AssemblyContext)_localctx).l!=null?((AssemblyContext)_localctx).l.getText():null));
+					((AssemblyContext)_localctx).label = match(LABEL);
+					code[i++] = BRANCHEQ; labelRef.put(i++,(((AssemblyContext)_localctx).label!=null?((AssemblyContext)_localctx).label.getText():null));
 					}
 					break;
 				case 13:
@@ -328,9 +324,8 @@ public class SVMParser extends Parser {
 					setState(31);
 					match(BRANCHLESSEQ);
 					setState(32);
-					((AssemblyContext)_localctx).l = match(LABEL);
-					code[i++] = BRANCHLESSEQ;
-					                          labelRef.put(i++,(((AssemblyContext)_localctx).l!=null?((AssemblyContext)_localctx).l.getText():null));
+					((AssemblyContext)_localctx).label = match(LABEL);
+					code[i++] = BRANCHLESSEQ; labelRef.put(i++,(((AssemblyContext)_localctx).label!=null?((AssemblyContext)_localctx).label.getText():null));
 					}
 					break;
 				case 14:
@@ -424,7 +419,7 @@ public class SVMParser extends Parser {
 				_la = _input.LA(1);
 			}
 			 for (Integer refAdd: labelRef.keySet()) {
-				              code[refAdd]=labelAdd.get(labelRef.get(refAdd));
+				              code[refAdd]=labelAddress.get(labelRef.get(refAdd));
 					     } 
 					   
 			}

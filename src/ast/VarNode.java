@@ -1,10 +1,11 @@
 package ast;
 
+import ast.core.DeclarationNode;
 import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
 
-public class VarNode implements Node {
+public class VarNode implements DeclarationNode {
 
 	private final String id;
 	private final Type type;
@@ -29,6 +30,11 @@ public class VarNode implements Node {
 
 	public String codeGeneration() {
 		return exp.codeGeneration();
+	}
+
+	@Override
+	public Type getSymbolType() {
+		return this.type;
 	}
 
 }

@@ -2,6 +2,7 @@ push 0
 push 5
 push 3
 add
+lfp
 push f0
 lfp
 push 8
@@ -9,8 +10,11 @@ push -2
 lfp
 add
 lw
-lfp
 push -3
+lfp
+add
+lw
+push -4
 lfp
 add
 lw

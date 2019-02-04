@@ -1,8 +1,10 @@
 package ast;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import ast.core.DeclarationNode;
 import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
@@ -10,11 +12,11 @@ import ast.util.FunctionDeclarations;
 
 public class ProgLetInNode implements Node {
 
-	private final List<Node> declarationList;
+	private final List<DeclarationNode> declarationList;
 	private final Node exp;
 
-	public ProgLetInNode(List<Node> declarationList, final Node exp) {
-		this.declarationList = declarationList;
+	public ProgLetInNode(List<DeclarationNode> declarationList, final Node exp) {
+		this.declarationList = new ArrayList<>(declarationList);
 		this.exp = exp;
 	}
 
