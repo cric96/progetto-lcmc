@@ -1,6 +1,5 @@
 let
-
-  class List (f:int, r:List) {
+  class List(f:int, r:List) {
     fun first:int() f;
     fun rest:List() r; 
   }

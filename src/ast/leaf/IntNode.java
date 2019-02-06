@@ -1,9 +1,11 @@
-package ast;
+package ast.leaf;
 
 import ast.core.Node;
 import ast.core.Type;
 import ast.type.IntType;
-
+/**
+ * definisce un nodo che mantiene il valore di un intero, resitustice il tipo IntType
+ */
 public class IntNode implements Node {
 
 	private final Integer val;

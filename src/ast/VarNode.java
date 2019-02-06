@@ -37,4 +37,9 @@ public class VarNode implements DeclarationNode {
 		return this.type;
 	}
 
+	@Override
+	public String toString() {
+		return "VarNode [id=" + id + ", type=" + type + ", exp=" + exp + "]";
+	}
+
 }

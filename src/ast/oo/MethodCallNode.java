@@ -1,32 +1,20 @@
-package ast;
+package ast.oo;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import ast.core.CallableNode;
+import ast.CallNode;
 import ast.core.Node;
 import ast.core.STentry;
-
 /**
- * Rappresenta il nodo derivante da una chiamata a funzione
+ * chiamata a metodo all'interno della classe
  */
-public class CallNode extends CallableNode {
-	/**
-	 * 
-	 * @param id l'id del nodo associato alla chiamata (f(a,b..) l'id è f)
-	 * @param entry entry posizionata nella symbol table
-	 * @param parlist l'insieme di parametri associata ad una chiamata a funzione
-	 * @param nestingLevel il nesting level dov'è usato il call node
-	 */
-	public CallNode(final String id, final STentry entry, final List<Node> parlist, final int nestingLevel) {
-		super(id,entry, parlist,nestingLevel);
+public class MethodCallNode extends CallNode {
+	
+	public MethodCallNode(String id, STentry entry, List<Node> parlist, int nestingLevel) {
+		super(id, entry, parlist, nestingLevel);
 	}
 
-	public String toPrint(final String s) {
-		final String parlstr = parlist.stream().map(x -> x.toPrint(" " + s)).collect(Collectors.joining());
-		return s + "Call:" + id + " at nestinglevel " + nestingLevel + "\n" + entry.toPrint(s + "  ") + parlstr;
-	}
-
+	@Override
 	public String codeGeneration() {
 		// creiamo la lista dei parametri della funzione chiamata, per farlo andiamo a
 		// valutare le espressioni scritte
@@ -39,7 +27,8 @@ public class CallNode extends CallableNode {
 		String getAR = "";
 		// risalgo la catena statica con un numero di "salti" pari alla differenza di
 		// nesting level
-		for (int i = 0; i < nestingLevel - entry.getNestinglevel(); i++) {
+		//+1 per arrivare alla dispatch table, serve per estensione ad oggetti
+		for (int i = 0; i < (nestingLevel - entry.getNestinglevel())+1; i++) {
 			getAR += "lw\n"; // avrò alla fine l'indirizzo dell'al dove è dichiarata la funz che sto
 								// chiamando
 		}

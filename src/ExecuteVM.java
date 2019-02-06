@@ -1,7 +1,9 @@
+import ast.util.Utils;
+
 public class ExecuteVM {
 
 	public static final int CODESIZE = 10000;
-	public static final int MEMSIZE = 10000;
+	public static final int MEMSIZE = Utils.MEM_SIZE;
 
 	private int[] code;
 	private int[] memory = new int[MEMSIZE];
@@ -21,7 +23,8 @@ public class ExecuteVM {
 	public void cpu() {
 		while (true) {
 			int bytecode = code[ip++]; // fetch
-
+			//printMemory();
+			
 			//System.out.println(ip + " " + printInstruction(bytecode) + " " + ra + " mem " + memory[sp-1]);
 			int v1, v2;
 			int address;
@@ -125,7 +128,20 @@ public class ExecuteVM {
 	private void push(int v) {
 		memory[--sp] = v;
 	}
-	/*
+	private void printMemory() {
+		System.out.println("STACK:::");
+		for(int i = 9999; i >= sp; i --) {
+			System.out.println(memory[i]);
+		}
+		System.out.println("________");
+		System.out.println("________");
+		System.out.println("________");
+		System.out.println("HEAP:::");
+		for(int i = hp; i >= 0; i--) {
+			System.out.println(memory[i]);
+		}
+	}
+	
 	private String printInstruction(int bytecode) {
 	switch (bytecode) {
 		case SVMParser.PUSH:
@@ -176,6 +192,6 @@ public class ExecuteVM {
 			return "halt";
 		}
 	return "";
-	}*/
+	}
 
 }

@@ -18,13 +18,110 @@ in
   print (f(3,5));
 
 ----------------
-*/
 let
   fun f:bool(n:int,x:int,y:int)
   	let fun g:bool(x:int)
+  		
   		true;
   	in
   		g(1);
   
 in  
   print (f(1,2,3));
+*/
+
+/* 
+ CLASSI (standard)
+
+let
+	class Person(id : int, year: int) {
+		fun getId:int()
+			id;
+		fun getYear:int()
+			year;
+		fun computeAge:int()
+			2018 - year;
+	}
+	
+	var gianluca : Person = new Person(123,1996);
+	var marta : Person = new Person(541,1996);
+	var cristiano : Person = new Person(1,1991);
+in
+	print(marta.computeAge());
+	
+// esempio di un for fatto con FOOL usando ricorsione + ho
+let 
+	class Void() {}
+	
+	fun for:Void(start : int, end : int, function : (int)->Void) 
+		let
+			var val : Void = function(start);
+		in
+			if(start <= (end-(1))) then {for(start +1,end,function)} else { null };	
+	
+	fun printIndex : Void(index : int) 
+		let
+			var value : int = print(index);
+		in
+			null;
+	
+	fun strangeIteration : Void (index : int) 
+		let
+			var value : int = print(index * 2 + 1);
+		in
+			null;
+in
+	for(1,10,strangeIteration);
+
+// HO + oggetti
+
+let
+	class Void() {}
+	
+	class Bird(cip : int) {
+		fun speak: int () print(cip);
+		fun speakThis: int (f : (Void) -> int) f(null);
+	}
+	var pappagallo : Bird = new Bird(1111111);
+	var funBird : Bird = new Bird(707);
+	
+	fun tryHigher: int (void : Void) print(10000);
+	fun printBirds : Void ()
+		let
+			var first : int = pappagallo.speak();
+			var second : int = pappagallo.speakThis(tryHigher);
+			var third : int = funBird.speak();
+		in
+			null;
+in
+	printBirds();
+ 
+*/
+ let 
+ 	class Animal(weight: int, funny: bool) {
+ 		fun getWeight : int () weight;
+ 		
+ 		fun isHeavierThan : bool(other : Animal, fool : int) weight >= (other.getWeight() + fool);	
+ 		
+ 		fun isFunny : bool () funny;
+ 	}
+ 	
+ 	var dada : Animal = new Animal(30,true);
+ 	var bibo : Animal = new Animal(20, false);
+ 	
+ 	var dadaIsFunny : bool = print(dada.isFunny());
+ 	var biboIsntFunny : bool = print(bibo.isFunny());
+ in
+ 	print(dada.isHeavierThan(bibo,10));
+
+/*
+let
+	var f : int = print(1110011001);
+	var s : int = print(1101100110);
+	var t : int = print(1101111101);
+	var fo : int = print(1110111011);
+	var di : int = print(1111010111);
+	var si : int = print(1111101111);	
+in
+	true
+*/

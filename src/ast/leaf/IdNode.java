@@ -1,11 +1,15 @@
-package ast;
+package ast.leaf;
 
 import ast.core.Node;
 import ast.core.STentry;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
 import ast.type.ArrowType;
-
+import ast.type.ClassType;
+/**
+ * un id può avere sia un tipo arrow sia un tipo standard (Int, Bool,..) ma NON può essere una classe (non posso usare un id della classe
+ * come se fosse una variabile)
+ */
 public class IdNode implements Node {
 
 	private final String id;
@@ -28,6 +32,10 @@ public class IdNode implements Node {
 		 * if (entry.getType() instanceof ArrowType) {
 			throw new WrongTypeException("Wrong usage of function identifier with " + id);}
 		 */	
+		//un id non può essere un riferimento
+		if(entry.getType() instanceof ClassType) {
+			throw new WrongTypeException("Wrong usage of class identifier with " + id);
+		}
 		return entry.getType();
 	}
 

@@ -9,7 +9,7 @@ import ast.core.Type;
 public class Test {
     public static void main(String[] args) throws Exception {
       
-        String fileName = "linsum.fool";
+        String fileName = "prova.fool";
       
         CharStream chars = CharStreams.fromFileName(fileName);
         FOOLLexer lexer = new FOOLLexer(chars);
@@ -24,6 +24,7 @@ public class Test {
         System.out.print(ast.toPrint(""));
         
         final Type type= ast.typeCheck(); //type-checking bottom-up
+     
         System.out.println(type.toPrint("Type checking ok! Type of the program is: "));  
      
         String code=ast.codeGeneration(); 

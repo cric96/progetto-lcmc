@@ -6,7 +6,9 @@ import ast.exception.WrongTypeException;
 import ast.type.BoolType;
 import ast.util.LabelGenerator;
 import ast.util.LabelGenerator.GenerationSeed;
-
+/**
+ * identifica un nodo if
+ */
 public class IfNode implements Node {
 
 	private final Node cond;

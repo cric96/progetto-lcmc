@@ -1,9 +1,12 @@
 // Generated from FOOL.g4 by ANTLR 4.7
 
 import java.util.*;
+import java.util.stream.*;
 import ast.*;
+import ast.leaf.*;
 import ast.core.*;
 import ast.type.*;
+import ast.oo.*;
 import ast.exception.*;
 import ast.operator.*;
 

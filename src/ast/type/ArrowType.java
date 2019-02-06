@@ -35,11 +35,8 @@ public class ArrowType implements Type {
 	}
 
 	public String toPrint(String s) {
-		String parlstr = "";
-		for (Type par : parlist) {
-			parlstr += par.toPrint(s + "  ");
-		}
-		return s + "ArrowTypeNode\n" + parlstr + ret.toPrint(s + "  ->");
+		String parlstr = parlist.stream().map(x -> x.toPrint(" " + s)).collect(Collectors.joining());
+		return s + "ArrowType\n" + parlstr + ret.toPrint(s + "  ->");
 	}
 	
 	public String toString() {

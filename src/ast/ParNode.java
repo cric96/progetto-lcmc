@@ -4,7 +4,9 @@ import java.util.Objects;
 
 import ast.core.DeclarationNode;
 import ast.core.Type;
-
+/**
+ * identifica un nodo che associato ad un parametro di una funzione
+ */
 public class ParNode implements DeclarationNode {
 
 	private final String id;

@@ -19,8 +19,8 @@ public class StandardSymbolTable implements SymbolTable {
 		this.nestingLevel = 0;
 	}
 	@Override
-	public void increaseNesting() {
-		current = new HashMap<>();
+	public void increaseNesting(final Map<String, STentry> newTable) {
+		current = new HashMap<>(newTable);
 		this.nestingLevel ++;
 		symTable.add(current);
 	}
@@ -32,15 +32,10 @@ public class StandardSymbolTable implements SymbolTable {
 	}
 
 	@Override
-	public boolean addEntry(final String id, final Type type, final int offset) {
-		return current.put(id,new STentry(nestingLevel, type, offset)) == null;
+	public boolean addEntry(final String id, final STentry entry) {
+		return symTable.get(entry.getNestinglevel()).put(id ,entry) == null;
 	}
 	
-	@Override
-	public boolean addEntryIn(String id, final Type type, final int offset, int nesting) {
-		return symTable.get(nesting).put(id,new STentry(nesting, type, offset)) == null;
-	}
-
 	@Override
 	public int getNesting() {
 		return nestingLevel;

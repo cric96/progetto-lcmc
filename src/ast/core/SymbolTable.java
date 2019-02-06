@@ -1,33 +1,28 @@
 package ast.core;
 
+import java.util.Map;
 import java.util.Optional;
-
+/**
+ * intefaccia generale per la descrizione di una symbol table
+ */
 public interface SymbolTable {
 	/**
 	 * aumenta il livello di nesting della symbol table
+	 * aggiungo una nuova tabella (nell'estensione ad oggetti è la virtual table)
 	 */
-	void increaseNesting();
+	void increaseNesting(Map<String, STentry> newTable);
 	/**
 	 * diminuisce il livello di nesting della symbol table
 	 */
 	void decreaseNesting();
 	/**
 	 * prova ad aggiungere un'entry nella symbol table
-	 * @param id, l'id dell'entry
-	 * @param type, il tipo associato all'id
-	 * @param offset, offset usato a runtime per riuscire a trovare il giusto valore nello stack
+	 * @param id, l'id del simbolo
+	 * @param entry, la entry da aggiungere
 	 * @return true se non è presente già un id in questo livello, false altrimenti
 	 */
-	boolean addEntry(String id, Type type, int offset);
-	/**
-	 * prova ad aggiungere un'entry nella symbol table nel nestring level passato
-	 * @param id l'id del node
-	 * @param type, il tipo associato all'id
-	 * @param offset, offset usato a runtime per riuscire a trovare il giusto valore nello stack
-	 * @param nesting il nesting level 
-	 * @return true se non è presente già un id in questo livello, false altrimenti
-	 */
-	boolean addEntryIn(String id, Type type, int offset, int nesting);
+	boolean addEntry(String id, STentry entry);
+	
 	/**
 	 * @return il corrente livello di nesting
 	 */
