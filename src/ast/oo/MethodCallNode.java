@@ -13,10 +13,10 @@ public class MethodCallNode extends CallNode {
 	public MethodCallNode(String id, STentry entry, List<Node> parlist, int nestingLevel) {
 		super(id, entry, parlist, nestingLevel);
 	}
-
+	//come callNode senza estensione HO e con un salto in più di nesting level per arrivare alla dispatch table
 	@Override
 	public String codeGeneration() {
-		// creiamo la lista dei parametri della funzione chiamata, per farlo andiamo a
+		// creiamo la lista dei parametri del metodo chiamata, per farlo andiamo a
 		// valutare le espressioni scritte
 		// nella chiamata a funzione esempio : f(5*3+2,g(2,3)) sullo stack avrò (in
 		// ordine) il valore di g(2,3) e 5*2+2
@@ -35,13 +35,11 @@ public class MethodCallNode extends CallNode {
 
 		return "lfp\n" + // Control Link
 				parCode + // allocazione valori parametri
-				/*"lfp\n" + getAR + // risalgo la catena statica per ottenere l'indirizzo dell'AR
-									// in cui è dichiarata la funzione (Access Link)
-									// nell'indirizzo di fp è salvato il valore dell'access link del corrente AR
-serviva prima dell'estensione higher order*/
-				"push " + entry.getOffset() + "\n" + "lfp\n" + getAR + //risalgo la catena statica per ottenere l'access link
-				"add\n" + "lw\n" +
-				"push " + (entry.getOffset()-1) + "\n" + "lfp\n" + getAR + // risalgo la catena statica per recuperare l'indirizzo della funzione
+				"lfp\n" + getAR + // risalgo la catena statica per ottenere l'indirizzo dell'AR
+									// in cui dichiarata la funzione (Access Link)
+				"push " + entry.getOffset() + "\n" + "lfp\n" + getAR + // risalgo la catena statica per ottenere
+																		// l'indirizzo dell'AR
+																		// in cui dichiarata la funzione (Access Link)
 				"add\n" + "lw\n" + // carica sullo stack l'indirizzo della funzione
 				"js\n"; // effettua il salto
 	}

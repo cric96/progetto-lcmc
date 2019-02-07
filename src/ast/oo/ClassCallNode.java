@@ -12,7 +12,6 @@ import ast.core.STentry;
  */
 public class ClassCallNode extends CallableNode {
 	private final STentry objectEntry;
-
 	/**
 	 * 
 	 * @param id

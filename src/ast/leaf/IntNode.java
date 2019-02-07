@@ -26,4 +26,10 @@ public class IntNode implements Node {
 		return "push " + val + "\n";
 	}
 
+	@Override
+	public String toString() {
+		return "IntNode [val=" + val + "]";
+	}
+	
+
 }

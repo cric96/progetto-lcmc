@@ -30,6 +30,7 @@ public class EmptyNode implements Node {
 
 	@Override
 	public String codeGeneration() {
+		//null è associato al valore -1
 		return "push -1\n";
 	}
 

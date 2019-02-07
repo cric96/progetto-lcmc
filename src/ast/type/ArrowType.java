@@ -2,6 +2,7 @@ package ast.type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import ast.core.Type;
@@ -53,11 +54,38 @@ public class ArrowType implements Type {
 			return false;
 		}
 		for (int i = 0; i < parlist.size(); i++) {
-			if (!(parlist.get(i)).isSubtype((p.get(i)))) {
+			if (!(p.get(i)).isSubtype((parlist.get(i)))) {
 				return false;
 			}
 		}
-		return true;
+		return ret.isSubtype(t.getReturnType());
+	}
+	@Override
+	public Optional<Type> lowestCommonAncestor(Type other) {
+		if(!(other instanceof ArrowType)) {
+			return Optional.empty();
+		}
+		final ArrowType t = (ArrowType)other;
+		final List<Type> p = t.getParList();
+		if (!(p.size() == parlist.size())) {
+			return Optional.empty();
+		}
+		final Optional<Type> returnLowestCommonAncestor = this.ret.lowestCommonAncestor(t.getReturnType());
+		if(!returnLowestCommonAncestor.isPresent()) {
+			return Optional.empty();
+		}
+		final List<Type> parListTypes = new ArrayList<>();
+		for (int i = 0; i < parlist.size(); i++) {
+			if ((p.get(i)).isSubtype((parlist.get(i)))) {
+				parListTypes.add(p.get(i));
+			} else if(parlist.get(i).isSubtype(p.get(i))) {
+				parListTypes.add(parlist.get(i));
+			} else {
+				return null;
+			}
+		}
+		
+		return Optional.of(new ArrowType(parListTypes, returnLowestCommonAncestor.get()));
 	}
 
 }

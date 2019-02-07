@@ -8,6 +8,7 @@ let
     fun getInv:int () invested;
   }
   
+  
   class BankLoan (loan: Account) {
     fun getLoan:Account () loan;
     fun openLoan:Account (m:TradingAcc) if ((m.getMon()+m.getInv())>=30000) 
@@ -24,5 +25,4 @@ let
   var bl:BankLoan = new MyBankLoan(new TradingAcc(50000,40000));
   var myTradingAcc:TradingAcc = new TradingAcc(20000,5000);
   var myLoan:Account = bl.openLoan(myTradingAcc);
-      
 in print(if (myLoan==null) then {0} else {myLoan.getMon()});  

@@ -16,4 +16,8 @@ public class DispatchTable {
 	public static void addDispatchTable(List<String> methods) {
 		dispatchTables.add(methods);
 	}
-}
+	public static List<String> getDispatchTable(final int offset) {
+		final int offsetToIndex = (offset + 2)*-1;
+		return dispatchTables.get(offsetToIndex);
+	}
+ }

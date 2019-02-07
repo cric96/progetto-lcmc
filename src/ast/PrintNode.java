@@ -3,7 +3,9 @@ package ast;
 import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
-
+/**
+ * Nodo semplice associato all'istruzione print
+ */
 public class PrintNode implements Node {
 
 	private final Node exp;

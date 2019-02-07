@@ -53,6 +53,7 @@ import ast.operator.*;
 prog returns [Node ast] : 
     (
     	{
+    		//in questa lista verranno salvate tutte le dichiarazioni (classe,funzione,variabili) che poi si utilizzeranno nel nodo ProgLetIn 
     		final List<DeclarationNode> declarations = new ArrayList<>();
     	} 
     	//in questo caso il programma è del tipo let ... in ...
@@ -87,73 +88,157 @@ prog returns [Node ast] :
 
 
 cllist returns [List<DeclarationNode> classes]: {
-		classesDecl = true;
-		$classes = new ArrayList<>();
+		classesDecl = true; /*
+		 * viene utilizzato per settare correttamente l'offset della declaration list successiva alla classi, 
+		 * nel caso ci siano delle classi dichiarate, l'offset delle altre funzioni e dichiarazioni deve essere successivo
+		 * a quello delle classi (offset classi - 1)
+		 */
+		$classes = new ArrayList<>(); //insieme delle dichiarazioni delle classi
 	}
 	( CLASS classId=ID {
-		final List<FieldNode> fields = new ArrayList<>();
-		final List<MethodNode> methods = new ArrayList<>();
-		final Map<String, STentry> vt = new HashMap<>();
-		classTable.addClass($classId.text, vt);
-		symTable.increaseNesting(new HashMap<>()/*da riempire quando farò ereditarietà */);
-	} (EXTENDS ID {/*da fare ereditarietà */})?
+		final List<FieldNode> fields = new ArrayList<>(); //lista dove vengono memorizzati i campi nel classNode corrente (non quelli ereditati)
+		final Set<String> fieldsName = new HashSet<>(); /*OTTIMIZZAZIONE: evita l'overriding di campi dichiarati nella stessa classe */
+		final Set<String> methodsName = new HashSet<>(); /*OTTIMIZZAZIONE: evita l'overriding di metodi dichiarati nella stessa classe */
+		final List<MethodNode> methods = new ArrayList<>(); //lista dove vengono memorizzati i metodi nel classNode corrente (non quelli ereditati)
+		final Map<String, STentry> vt = new HashMap<>(); //virtual table della classe corrente
+		classTable.addClass($classId.text, vt); //aggiungo la classe nella class table, la virtual table verrà popolata man mano che scorro le dichiarazioni nella classe
+		STentry superEntry = null; //descrive l'entry della classe ereditata
+		final ClassType classType = new ClassType($classId.text, 
+          		new ArrayList<>(), new ArrayList<>());
+        //classType è il tipo della classe corrente che verrà popolato durante con tutti i metodi e campi in modo incrementale
+        final STentry classEntry = STentry.createStandard(0, classType, --classOffset); //creo l'entry da aggiungere nella symbol table (nesting level sempre uguale a 0 per le classi)
+  		symTable.addEntry($classId.text,classEntry); //aggiungo l'entry nella symbol table così facendo sarà visibile nel corpo della classe 
+  		
+	} (EXTENDS className=ID {
+		/* OGGETTI CON EREDITARIETà*/
+		//verifico se estensione è legitta, cioè se esiste la classe con il nome id, per farlo utilizzo la class table
+		if(!classTable.isClassPresent($className.text)) {
+			//nel caso che non sia presente lancio un'eccezione
+			throw new NotDeclaredException(Declaration.Class, $className.text, $className.line);
+		}
+		ClassHierarchy.addRelation($className.text, $classId.text); //aggiungo una relazione padre figlio tra la classe corrente e la super classe
+		superEntry = symTable.findEntryById($className.text).get(); //vado a cercare l'entry della super classe nella symbol table
+		final ClassType superType = (ClassType) symTable.findEntryById($className.text).get().getType(); //cast al tipo corretto 
+		final Map<String, STentry> superVt = classTable.getVirtualTable($className.text); /*
+		 * prendo la virtual table della super classe in modo da copiare nella virtual table corrente i campi
+		 * ed i metodi della super classe
+		 */
+		final List<Type> superFields = superType.getFields(); //tipi dei campi della super classe
+		final List<Type> superMethods = superType.getMethods(); //tipo dei metodi della super classe
+		superFields.forEach(classType::addField); //aggiungo tutti i campi della super classe alla sotto classe
+		superMethods.forEach(classType::addMethod); //aggiungo tutti i metodi della super classe alla sotto classe
+		vt.putAll(superVt); //aggiorno la virtual table della sotto classe mettendo tutto il contenuto della super classe
+	})? {
+		/*NB! in seguito ci appoggiamo comunque alla symTable per prendere il nesting level corrente, in questo caso in realtà
+		 * si potrebbe non usare, infatti sappiamo che i campi e i metodi avranno tutti nesting level 1 e le dichiarazioni interne
+		 * ai metodi avranno nesting level 2
+		 * 
+		 * in questo punto si inizializza la symbol table con il valore della corrente virtual table per via dell'ereditarietà 
+		 */
+		symTable.increaseNesting(vt);
+	}
 	/*attributi */ 
 	LPAR (fieldName=ID COLON fieldType=type {
-		int offset = 0;
-		fields.add(new FieldNode($fieldName.text, $fieldType.nodeType));	
-		final STentry firstFieldEntry = STentry.createStandard(symTable.getNesting(), $fieldType.nodeType, --offset);
-		if (!symTable.addEntry($fieldName.text,firstFieldEntry))
-        {
-        	throw new AlreadyDeclaredException(Declaration.Field,$fieldName.text,$fieldName.line);
-        }
+		/* ESTENSIONE CON EREDITARIETà: l'offset dei attributi deve essere successivo a quello della super classe (se è presente)
+      	 * perciò parte all'offset corrente di tutti i campi (corrispondente alla lunghezza dei campi ereditati negativa
+      	 * se non ho campi ereditati parto da 0)
+      	 * */
+		int offset = -classType.getFields().size();
+		fieldsName.add($fieldName.text); //aggiungo il nome dell'attributo corrente per verificare che non sia ridefinito all'interno di questa classe OTTIMIZZAZIONE
+		fields.add(new FieldNode($fieldName.text, $fieldType.nodeType)); //aggiungo il campo corrente a quelli del class node
+		STentry firstFieldEntry = null; //entry del campo corrente
+		STentry supEntry = vt.get($fieldName.text); //verifico se c'è overriding, per farlo devo vedere se nella virtual table sia già presente un campo con lo stesso nome
+		if(supEntry == null) { 
+			//in questo caso non è presente, non c'è overriding incodo l'attributo corrente sotto gli altri
+			
+			firstFieldEntry = STentry.createStandard(symTable.getNesting(), $fieldType.nodeType, --offset);
+			classType.addField($fieldType.nodeType);
+		} else {
+			//in questo caso c'è già un entry associato al nome del campo, devo vedere che non sia un metodo
+			if(supEntry.isMethod()) {
+				//se lo è lancio un eccezione apposita
+				throw new IllegalOverridingException(Declaration.Method, Declaration.Field);
+			}
+			//creo la nuova entry associata al campo facendo override, cioè mettendo nell'entry l'offset associato al campo della super classe
+			firstFieldEntry = STentry.createStandard(symTable.getNesting(), $fieldType.nodeType, supEntry.getOffset());
+			//aggiorno il tipo della classe corrente dicendo che c'è stato un override all'offset specificato
+			classType.addOverridedField($fieldType.nodeType, supEntry.getOffset());
+		}
+		//aggiorno la symbol table e la virtual table		
+		symTable.addEntry($fieldName.text,firstFieldEntry);  
         vt.put($fieldName.text, firstFieldEntry);
 	} 
 	(COMMA otherFieldName=ID COLON otherFieldType=type {
+		//controllo che non si sia fatta una redifinizione del campo nella stessa classe
+		if(fieldsName.contains($otherFieldName.text)) {
+			throw new AlreadyDeclaredException(Declaration.Field, $otherFieldName.text, $otherFieldName.line);
+		}
+		//da qui in poi è uguale alla definizione del primo campo
+		fieldsName.add($otherFieldName.text);
 		fields.add(new FieldNode($otherFieldName.text, $otherFieldType.nodeType));
-		final STentry otherFieldEntry = STentry.createStandard(symTable.getNesting(), $otherFieldType.nodeType, --offset);
-		if (!symTable.addEntry($otherFieldName.text,otherFieldEntry))
-        {
-        	throw new AlreadyDeclaredException(Declaration.Field,$otherFieldName.text,$otherFieldName.line);
-        }
+		STentry otherFieldEntry = null;
+		supEntry = vt.get($otherFieldName.text);
+		if(supEntry == null) {
+			otherFieldEntry = STentry.createStandard(symTable.getNesting(), $otherFieldType.nodeType, --offset);
+			classType.addField($otherFieldType.nodeType);
+		} else {
+			if(supEntry.isMethod()) {
+				throw new IllegalOverridingException(Declaration.Method, Declaration.Field);
+			}
+			otherFieldEntry = STentry.createStandard(symTable.getNesting(), $otherFieldType.nodeType, supEntry.getOffset());
+			classType.addOverridedField($otherFieldType.nodeType, supEntry.getOffset());
+		}
+				
+		symTable.addEntry($otherFieldName.text,otherFieldEntry);  
         vt.put($otherFieldName.text, otherFieldEntry);
         
 	})* )? RPAR   
 	/*metodi*/ 
               CLPAR
-              { /*ricorda che dopo metodi e campi dovranno essere arricchiti con quelli ereditati */
-              	int methodOffset = 0;
-              	final ClassType classType = new ClassType($classId.text, 
-          		new ArrayList<>(),
-          		fields.stream().map(DeclarationNode::getSymbolType).collect(Collectors.toList()));
-          		final STentry classEntry = STentry.createStandard(0, classType, --classOffset);
-          		symTable.addEntry($classId.text,classEntry);
+              { 
+              	/* ESTENSIONE CON EREDITARIETà: l'offset dei metodi deve essere successivo a quello della super classe (se è presente)
+              	 * perciò parte all'offset corrente di tutti i metodi (se non ho metodi ereditati parto da 0)
+              	 * */
+              	int methodOffset = classType.getMethods().size();
           	
               }
                  ( FUN methodId=ID COLON returnType=type {
-                 	final List<Type> parTypes = new ArrayList<>();
+                 	final List<Type> parTypes = new ArrayList<>(); //mi memorizzo tutti i tipi dei parametri dei metoi
 		            //creo il function node associato
-		            final MethodNode method = new MethodNode($methodId.text,$returnType.nodeType, methodOffset);     
+		            final MethodNode method = new MethodNode($methodId.text,$returnType.nodeType, methodOffset); 
+		            //OTTIMIZZAZIONE verifico che non ci sia una redifizione del metodo nella stessa classe
+		            if(methodsName.contains($methodId.text)) {
+						throw new AlreadyDeclaredException(Declaration.Field, $methodId.text, $methodId.line);
+					}
+					//nome metodo ok, aggiungo il nome del metodo ai nomi dei metodi della classe corrente
+					methodsName.add($methodId.text);    
 		            //aggiungo alla declarations list la funzione appena dichiarata 
 		            methods.add(method);
 		            //valori che mi serviranno per aggiungere l'entry nella symbol table
 		            final int methodNesting = symTable.getNesting();
-		            symTable.increaseNesting(new HashMap<>());
+		            //come per le funzioni, i parametri sono a + 1 rispetto al fp
                  	int parOffset = 1;
+                 	//aumento il nesting level della symbol table
+                 	symTable.increaseNesting(new HashMap<>());
                  }
                  LPAR (firstId=ID COLON firstType=hotype {
-	            	//aggiungo un parametro alla dichiarazione di funzioni
+                
+	            	//aggiungo un parametro alla dichiarazione dei metodi 
 	                parTypes.add($firstType.nodeType);
 	                ParNode fpar = new ParNode($firstId.text,$firstType.nodeType); //creo nodo ParNode
-	                method.addPar(fpar);                                 //lo attacco al FunNode con addPar
+	                method.addPar(fpar);                                 //lo attacco al MethodNode con addPar
 	                //se il parametro era di tipo funzionale occupa doppio offset
 	                parOffset = fpar.getSymbolType() instanceof ArrowType ? parOffset + 1 : parOffset;
+	                //creo la nuova entry per il parametro
 	                final STentry entry = STentry.createStandard(symTable.getNesting(), $firstType.nodeType, parOffset++);
+	                //verifico se è già presente un entry con lo stesso nome, nel caso lancio un'eccezione 
 	                if (!symTable.addEntry($firstId.text, entry)){
 	                    throw new AlreadyDeclaredException(Declaration.Parameter,$firstId.text,$firstId.line);
 	                }
                 
               	}
                 (COMMA otherId=ID COLON otherType=hotype {
+                	//stesso discorso del primo parametro
 					parTypes.add($otherType.nodeType);
 					ParNode par = new ParNode($otherId.text,$otherType.nodeType); 
 					method.addPar(par);
@@ -167,11 +252,28 @@ cllist returns [List<DeclarationNode> classes]: {
                 RPAR { 
 	               	// a questo punto posso aggiungere il metodo alla symbol table visto che ho tutte le sue informazioni
 	               	final Type methodType = new ArrowType(parTypes,$returnType.nodeType);
-	               	classType.addMethod(methodType);
-                	final STentry methodEntry = STentry.createMethod(methodNesting, methodType, methodOffset++);
-	                if(!symTable.addEntry($methodId.text, methodEntry)){
-	                	throw new AlreadyDeclaredException(Declaration.Function,$methodId.text,$methodId.line);
-	                }
+	               	//ESTENSIONE CON EREDITARIETà: verifico che il metodo sia già stato dichiarato, vado a controllare la virtual table
+	               	final STentry superMethod = vt.get($methodId.text);
+	               	STentry methodEntry = null;
+	               	if(superMethod == null) {
+	               		//se è null vuol dire che il metodo non era presente, allora lo accodo ai nuovi metodi della classe
+	               		methodEntry = STentry.createMethod(methodNesting, methodType, methodOffset++);
+	               		classType.addMethod(methodType);
+	               	} else {
+	               		//ho fatto overriding, allora devo verificare che l'entry associata al nome sia un metodo altrimenti lancio eccezione
+	               		if(!superMethod.isMethod()) {
+	               			throw new IllegalOverridingException(Declaration.Field, Declaration.Method);
+	               		}
+	               		//creo la nuova entry associata al metodo usando l'offset del metodo della classe padre
+	               		methodEntry = STentry.createMethod(methodNesting, methodType, superMethod.getOffset());
+	               		//sovrascrivo il tipo del metodo con quello nuovo
+	               		classType.addOverridedMethod(methodType, superMethod.getOffset());
+	               		//aggiungo il metodo alla symbol table
+	               		//modifico l'offset nel methodNode
+	               		method.overrideOffset(superMethod.getOffset());
+	               	}   	
+                	
+	                symTable.addEntry($methodId.text, methodEntry);
 	                // utilizzato per l'offset delle dichiarazioni all'interno del metodo
 	                
 					vt.put($methodId.text, methodEntry);
@@ -193,14 +295,17 @@ cllist returns [List<DeclarationNode> classes]: {
 			            } 					
 	               })+ IN)? methodExp = exp SEMIC 
 	               {
-	               		method.addBody($methodExp.ast);
-	               		symTable.decreaseNesting();
+	               		method.addBody($methodExp.ast); //aggiungo il body al metodo
+	               		symTable.decreaseNesting(); //esco dal nesting nel metodo corrente 
 	               }
         	     )*                
               CRPAR
           {
-          	final DeclarationNode classNode = new ClassNode(classType, $classId.text, fields, methods);	
+	        //a questo punto ho tutti i metodi e tutti i campi della classe corrente, posso creare il class node
+          	final DeclarationNode classNode = new ClassNode(classType, $classId.text, fields, methods, superEntry);	
+          	//aggiungo la classe ai nodi da restituire
           	$classes.add(classNode);
+          	//esco dal nesting level
           	symTable.decreaseNesting();
           })+ 
         ;
@@ -332,8 +437,8 @@ value returns [Node ast]
 	    | TRUE { $ast= BoolNode.trueNode();}  
     	| FALSE { $ast= BoolNode.falseNode();}  
 	    | NULL {$ast = EmptyNode.instance();} 
-	    //new node, in questo caso devo verificare se l'id è una classe
 	    | NEW id=ID {
+	    		//lista dei parametri passata al costruttore
 	    		final List<Node> parNodes = new ArrayList<>();
 	    		//per verificare se è presente nelle classe uso la class table
 	    		if (!classTable.isClassPresent($id.text)){

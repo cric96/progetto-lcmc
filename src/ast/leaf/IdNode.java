@@ -33,8 +33,14 @@ public class IdNode implements Node {
 			throw new WrongTypeException("Wrong usage of function identifier with " + id);}
 		 */	
 		//un id non può essere un riferimento
-		if(entry.getType() instanceof ClassType) {
+		if(entry.getType() instanceof ClassType ) {
 			throw new WrongTypeException("Wrong usage of class identifier with " + id);
+		}
+		/*
+		 * estensione ho + oo, un id non può essere un metodo!
+		 */
+		if(entry.isMethod()) {
+			throw new WrongTypeException("Wrong usage of method identifier with " + id);
 		}
 		return entry.getType();
 	}

@@ -1,5 +1,7 @@
 package ast.type;
 
+import java.util.Optional;
+
 import ast.core.Type;
 
 public class IntType implements Type {
@@ -30,5 +32,10 @@ public class IntType implements Type {
 	public boolean isSubtype(Type type) {
 		//posso farlo perchè utilizzo il pattern singleton e perciò se è un intero sicuramente è dell'istanza INT_TYPE
 		return type == INT_TYPE;
+	}
+
+	@Override
+	public Optional<Type> lowestCommonAncestor(Type other) {
+		return other instanceof IntType || other instanceof BoolType ? Optional.of(INT_TYPE) : Optional.empty();
 	}
 }

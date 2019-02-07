@@ -31,23 +31,34 @@ public abstract class FunctionalNode implements DeclarationNode {
 		this.id = id;
 		this.returnType = type;		
 	}
-
+	/**
+	 * aggiungo una dichiarazione associato al nodo corrente
+	 * @param d il nodo dichiarazione da aggiungere
+	 */
 	public void addDec(DeclarationNode d) {
 		declist.add(d);
 	}
-
+	/**
+	 * aggiungo il body del nodo corrente
+	 * @param b il node associato al body
+	 */
 	public void addBody(Node b) {
 		exp = b;
 	}
-
+	/**
+	 * aggiungo un parametro al nodo corrente
+	 * @param p il tipo del parametro
+	 */
 	public void addPar(DeclarationNode p) { // metodo "addPar" che aggiunge un nodo a campo "parlist"
 		parlist.add(p);
 	}
 
 	public Type typeCheck() throws WrongTypeException {
+		//chiamato type check su tutti i nodi
 		for (final Node dec : declist) {
 			dec.typeCheck();
 		}
+		//verifico che il tipo di ritorno sia sovratipo del tipo valutato nel body
 		if (!exp.typeCheck().isSubtype(returnType)) {
 			throw new WrongTypeException("Incompatible value for variable",returnType,exp.typeCheck());
 		}

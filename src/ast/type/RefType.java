@@ -1,5 +1,7 @@
 package ast.type;
 
+import java.util.Optional;
+
 import ast.core.Type;
 
 public class RefType implements Type {
@@ -23,7 +25,7 @@ public class RefType implements Type {
 	@Override
 	public boolean isSubtype(Type type) {
 		if(type instanceof RefType) {
-			return this.id.equals(((RefType) type).getId());
+			return ClassHierarchy.isSubtype(((RefType) type).getId(), id);
 		}
 		return false;
 	}
@@ -31,6 +33,23 @@ public class RefType implements Type {
 	@Override
 	public String toString() {
 		return "RefType [id=" + id + "]";
+	}
+
+	@Override
+	public Optional<Type> lowestCommonAncestor(Type other) {
+		if(other instanceof NullType) {
+			return Optional.of(this);
+		}
+		if(other instanceof RefType) {
+			Optional<RefType> check = Optional.of((RefType) this);
+			while(check.isPresent()) {
+				if(other.isSubtype(check.get())) {
+					return Optional.of(check.get());
+				}
+				check = ClassHierarchy.getFather(check.get().getId());
+			}
+		}
+		return Optional.empty();
 	}
 
 }

@@ -1,4 +1,7 @@
 package ast.core;
+
+import java.util.Optional;
+
 /**
  * concetto radice di tutti i possibili tipi
  */
@@ -15,4 +18,12 @@ public interface Type {
 	 * @return true se l'oggetto su cui chiamo il metodo è sottotipo di quello passato come parametro, false altrimenti
 	 */
 	boolean isSubtype (Type type);
+	
+	/**
+	 * Trova se c'è un antenato comune tra il tipo da cui lo sto chiamando
+	 * e il tipo passato
+	 * @param other
+	 * @return il tipo antenato comune al interno di un Optional, Optional.empty altrimenti
+	 */
+	Optional<Type> lowestCommonAncestor(Type other);
 }

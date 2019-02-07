@@ -8,7 +8,7 @@ import ast.core.Type;
  * descrive un nodo associato ad un metodo di una classe
  */
 public class MethodNode extends FunctionalNode {
-	private final int offset;
+	private int offset;
 	public MethodNode(final String id, final Type returnType, final int offset) {
 		super(id, returnType);
 		this.offset = offset;
@@ -29,7 +29,10 @@ public class MethodNode extends FunctionalNode {
 	public int getOffset() {
 		return this.offset;
 	}
-
+	
+	public void overrideOffset(int offset) {
+		this.offset = offset;
+	}
 	@Override
 	protected String getCodeStacked() {
 		return null;

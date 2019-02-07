@@ -96,7 +96,6 @@ let
 in
 	printBirds();
  
-*/
  let 
  	class Animal(weight: int, funny: bool) {
  		fun getWeight : int () weight;
@@ -114,7 +113,7 @@ in
  in
  	print(dada.isHeavierThan(bibo,10));
 
-/*
+
 let
 	var f : int = print(1110011001);
 	var s : int = print(1101100110);
@@ -125,3 +124,18 @@ let
 in
 	true
 */
+
+let 
+	class A() {
+	}
+	class B extends A() {
+		
+	}
+	class D extends B() {
+	}
+	class C extends A() {
+	
+	}
+	var check: A = if (true) then { null} else { null};
+in
+	true;

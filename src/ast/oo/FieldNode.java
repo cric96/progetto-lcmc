@@ -22,13 +22,13 @@ public class FieldNode implements DeclarationNode {
 	public String toPrint(String indent) {
 		return indent + "Field:" + name + "\n" + type.toPrint(indent + "  ");
 	}
-
+	//non viene mai eseguito
 	@Override
 	public Type typeCheck() throws WrongTypeException {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	//non viene mai eseguito 
 	@Override
 	public String codeGeneration() {
 		// TODO Auto-generated method stub

@@ -1,5 +1,7 @@
 package ast.type;
 
+import java.util.Optional;
+
 import ast.core.Type;
 
 public class BoolType implements Type {
@@ -22,5 +24,13 @@ public class BoolType implements Type {
 	@Override
 	public boolean isSubtype(Type type) {
 		return type == IntType.instance() || type == BOOL_TYPE;
+	}
+
+	@Override
+	public Optional<Type> lowestCommonAncestor(Type other) {
+		if(other instanceof IntType) {
+			return Optional.of(IntType.instance());
+		}
+		return other instanceof BoolType ? Optional.of(BOOL_TYPE) : Optional.empty();
 	}
 }

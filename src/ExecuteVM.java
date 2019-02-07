@@ -23,9 +23,6 @@ public class ExecuteVM {
 	public void cpu() {
 		while (true) {
 			int bytecode = code[ip++]; // fetch
-			//printMemory();
-			
-			//System.out.println(ip + " " + printInstruction(bytecode) + " " + ra + " mem " + memory[sp-1]);
 			int v1, v2;
 			int address;
 			switch (bytecode) {
@@ -128,70 +125,5 @@ public class ExecuteVM {
 	private void push(int v) {
 		memory[--sp] = v;
 	}
-	private void printMemory() {
-		System.out.println("STACK:::");
-		for(int i = 9999; i >= sp; i --) {
-			System.out.println(memory[i]);
-		}
-		System.out.println("________");
-		System.out.println("________");
-		System.out.println("________");
-		System.out.println("HEAP:::");
-		for(int i = hp; i >= 0; i--) {
-			System.out.println(memory[i]);
-		}
-	}
 	
-	private String printInstruction(int bytecode) {
-	switch (bytecode) {
-		case SVMParser.PUSH:
-			return "push";
-		case SVMParser.POP:
-			return "pop";
-		case SVMParser.ADD:
-			return "add";
-		case SVMParser.MULT:
-			return "mult";
-		case SVMParser.DIV:
-			return "div";
-		case SVMParser.SUB:
-			return "sub";
-		case SVMParser.STOREW:
-			return "storew";
-		case SVMParser.LOADW:
-			return "loadw";
-		case SVMParser.BRANCH:
-			return "branch";
-		case SVMParser.BRANCHEQ: //
-			return "breancheq";
-		case SVMParser.BRANCHLESSEQ:
-			return "branchlesseq";
-		case SVMParser.JS: //
-			return "js";
-		case SVMParser.STORERA: //
-			return "storear";
-		case SVMParser.LOADRA: //
-			return "loadra";
-		case SVMParser.STORERV: //
-			return "storerv";
-		case SVMParser.LOADRV: //
-			return "loadrv";
-		case SVMParser.LOADFP: //
-			return "loadfp";
-		case SVMParser.STOREFP: //
-			return "storefp";
-		case SVMParser.COPYFP: //
-			return "copyfp";
-		case SVMParser.STOREHP: //
-			return "storehp";
-		case SVMParser.LOADHP: //
-			return "loadhp";
-		case SVMParser.PRINT:
-			return "print";
-		case SVMParser.HALT:
-			return "halt";
-		}
-	return "";
-	}
-
 }

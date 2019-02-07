@@ -1,5 +1,7 @@
 package ast.type;
 
+import java.util.Optional;
+
 import ast.core.Type;
 
 public class NullType implements Type {
@@ -22,5 +24,13 @@ public class NullType implements Type {
 	@Override
 	public boolean isSubtype(Type type) {
 		return type == NULL_TYPE  || type instanceof RefType;
+	}
+
+	@Override
+	public Optional<Type> lowestCommonAncestor(Type other) {
+		if(other instanceof NullType) {
+			return Optional.of(NULL_TYPE);
+		}
+		return other instanceof RefType ? Optional.of(other) : Optional.empty();
 	}
 }

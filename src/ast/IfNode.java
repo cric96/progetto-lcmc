@@ -1,5 +1,7 @@
 package ast;
 
+import java.util.Optional;
+
 import ast.core.Node;
 import ast.core.Type;
 import ast.exception.WrongTypeException;
@@ -31,11 +33,11 @@ public class IfNode implements Node {
 		}
 		final Type then = th.typeCheck();
 		final Type e = el.typeCheck();
-		if (then.isSubtype(e))
-			return e;
-		if (e.isSubtype(then))
-			return then;
-		throw new WrongTypeException("Incompatible types in then-else branches");
+		final Optional<Type> lca = e.lowestCommonAncestor(then);
+		if(!lca.isPresent()) {
+			throw new WrongTypeException("Incompatible types in then-else branches");
+		}
+		return lca.get();
 	}
 
 	public String codeGeneration() {
