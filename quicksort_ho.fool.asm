@@ -26,17 +26,17 @@ lfp
 push inc9
 lfp
 push dec10
-e:
+
 push 2
-e:
+
 push 1
-e:
+
 push 4
-e:
+
 push 3
-e:
+
 push 2
-e:
+
 push 5
 push -1
 lhp
@@ -234,7 +234,7 @@ js
 makeList2:
 cfp
 lra
-e:
+
 push 2
 lfp
 add
@@ -374,7 +374,7 @@ push 1
 equal3: 
 push 1
 beq ifTrue1
-e:
+
 lfp
 push 1
 lfp
@@ -535,7 +535,7 @@ lw
 js
 b ifFalse3
 ifTrue3: 
-e:
+
 lfp
 push 1
 lfp
@@ -746,7 +746,7 @@ equal9:
 push 1
 beq ifTrue5
 lfp
-e:
+
 push -2
 lfp
 add

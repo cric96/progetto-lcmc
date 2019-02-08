@@ -86,6 +86,7 @@ public class ArrowType implements Type {
 		}
 		
 		return Optional.of(new ArrowType(parListTypes, returnLowestCommonAncestor.get()));
+		
 	}
 
 }

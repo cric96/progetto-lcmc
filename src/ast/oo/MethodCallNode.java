@@ -28,7 +28,7 @@ public class MethodCallNode extends CallNode {
 		// risalgo la catena statica con un numero di "salti" pari alla differenza di
 		// nesting level
 		//+1 per arrivare alla dispatch table, serve per estensione ad oggetti
-		for (int i = 0; i < (nestingLevel - entry.getNestinglevel())+1; i++) {
+		for (int i = 0; i < (nestingLevel - entry.getNestinglevel()); i++) {
 			getAR += "lw\n"; // avrò alla fine l'indirizzo dell'al dove è dichiarata la funz che sto
 								// chiamando
 		}
@@ -37,7 +37,9 @@ public class MethodCallNode extends CallNode {
 				parCode + // allocazione valori parametri
 				"lfp\n" + getAR + // risalgo la catena statica per ottenere l'indirizzo dell'AR
 									// in cui dichiarata la funzione (Access Link)
-				"push " + entry.getOffset() + "\n" + "lfp\n" + getAR + // risalgo la catena statica per ottenere
+				"push " + entry.getOffset() + "\n" + "lfp\n" + getAR 
+				+ "lw\n"+ //ESTENSIONE PER CHIAMATA A METODO! DEVO FARE UN SALTO IN PIù al DISPATCH POINTER!
+																		// risalgo la catena statica per ottenere
 																		// l'indirizzo dell'AR
 																		// in cui dichiarata la funzione (Access Link)
 				"add\n" + "lw\n" + // carica sullo stack l'indirizzo della funzione

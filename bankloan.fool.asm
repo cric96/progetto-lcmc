@@ -52,8 +52,8 @@ lhp
 push 1
 add
 shp
-e:
-e:
+
+
 push 50000
 push 40000
 lhp
@@ -92,7 +92,7 @@ lhp
 push 1
 add
 shp
-e:
+
 push 20000
 push 5000
 lhp
@@ -262,7 +262,7 @@ beq ifTrue0
 push -1
 b ifFalse0
 ifTrue0: 
-e:
+
 lfp
 push -1
 lfp
@@ -335,7 +335,7 @@ beq ifTrue1
 push -1
 b ifFalse1
 ifTrue1: 
-e:
+
 lfp
 push -1
 lfp

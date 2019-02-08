@@ -20,5 +20,9 @@ public class FunctionDeclarations {
 	public static String getCode() {
 		return funCode;
 	}
+	
+	public static void clearCode() {
+		funCode = "";
+	}
 
 }

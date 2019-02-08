@@ -15,7 +15,7 @@ public class ExecuteVM {
 	private int fp = MEMSIZE;
 	private int ra;
 	private int rv;
-
+	private int lastValue = -1; //SOLO PER MOTIVI DI TEST
 	public ExecuteVM(int[] code) {
 		this.code = code;
 	}
@@ -25,6 +25,7 @@ public class ExecuteVM {
 			int bytecode = code[ip++]; // fetch
 			int v1, v2;
 			int address;
+		
 			switch (bytecode) {
 			case SVMParser.PUSH:
 				push(code[ip++]);
@@ -113,11 +114,15 @@ public class ExecuteVM {
 				System.out.println((sp < MEMSIZE) ? memory[sp] : "Empty stack!");
 				break;
 			case SVMParser.HALT:
+				lastValue = (sp < MEMSIZE) ? memory[sp] : -1;
 				return;
 			}
 		}
 	}
-
+	
+	public int lastValue() {
+		return lastValue;
+	}
 	private int pop() {
 		return memory[sp++];
 	}

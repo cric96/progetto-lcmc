@@ -68,5 +68,7 @@ public class ClassType implements Type {
 	public Optional<Type> lowestCommonAncestor(Type other) {
 		return Optional.empty();
 	}
+	
+	
 
 }
